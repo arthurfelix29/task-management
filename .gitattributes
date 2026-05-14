@@ -1,0 +1,87 @@
+# Default: auto-normalize text files
+* text=auto eol=lf
+
+# ─────────────────────────────────────────────────────────────
+# .NET source code: force LF
+# ─────────────────────────────────────────────────────────────
+*.cs text eol=lf
+*.csproj text eol=lf
+*.sln text eol=lf
+*.slnx text eol=lf
+*.props text eol=lf
+*.targets text eol=lf
+*.config text eol=lf
+*.razor text eol=lf
+*.cshtml text eol=lf
+
+# ─────────────────────────────────────────────────────────────
+# Data and config: force LF
+# ─────────────────────────────────────────────────────────────
+*.json text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.sql text eol=lf
+*.md text eol=lf
+*.http text eol=lf
+*.editorconfig text eol=lf
+*.gitignore text eol=lf
+*.gitattributes text eol=lf
+
+# ─────────────────────────────────────────────────────────────
+# Frontend (Vue/TS/JS): force LF
+# ─────────────────────────────────────────────────────────────
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.vue text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf
+
+# ─────────────────────────────────────────────────────────────
+# Shell scripts: force LF
+# ─────────────────────────────────────────────────────────────
+*.sh text eol=lf
+Dockerfile text eol=lf
+.dockerignore text eol=lf
+
+# ─────────────────────────────────────────────────────────────
+# Windows scripts: must keep CRLF
+# ─────────────────────────────────────────────────────────────
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# ─────────────────────────────────────────────────────────────
+# Binaries (do not normalize)
+# ─────────────────────────────────────────────────────────────
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.webp binary
+*.dll binary
+*.exe binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# ─────────────────────────────────────────────────────────────
+# GitHub linguist hints
+# ─────────────────────────────────────────────────────────────
+*.cs linguist-language=C#
+*.vue linguist-language=Vue
+*.razor linguist-language=Razor
+*.generated.cs linguist-generated=true
+**/Migrations/* linguist-generated=true
+docs/* linguist-documentation

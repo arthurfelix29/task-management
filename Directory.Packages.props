@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup Label="Health Checks">
-    <PackageVersion Include="AspNetCore.HealthChecks.Sqlite" Version="10.0.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.Sqlite" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup Label="Testing">

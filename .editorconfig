@@ -164,6 +164,11 @@ dotnet_diagnostic.S2178.severity = warning   # Short-circuit logic should be use
 # Banned API analyzer (Microsoft.CodeAnalysis.BannedApiAnalyzers must be referenced)
 dotnet_diagnostic.RS0030.severity = error    # Do not use banned APIs
 
+# CA1848 — LoggerMessage delegates: the perf gain matters on hot paths only.
+# For exception logging and ad-hoc info messages the boilerplate is not worth
+# the win, and ILogger extension methods are the documented house style.
+dotnet_diagnostic.CA1848.severity = none
+
 # ─────────────────────────────────────────────────────────────
 # Test projects — relax conventions that conflict with xUnit norms
 # ─────────────────────────────────────────────────────────────

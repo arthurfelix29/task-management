@@ -163,3 +163,9 @@ dotnet_diagnostic.S2178.severity = warning   # Short-circuit logic should be use
 
 # Banned API analyzer (Microsoft.CodeAnalysis.BannedApiAnalyzers must be referenced)
 dotnet_diagnostic.RS0030.severity = error    # Do not use banned APIs
+
+# ─────────────────────────────────────────────────────────────
+# Test projects — relax conventions that conflict with xUnit norms
+# ─────────────────────────────────────────────────────────────
+[tests/**/*.cs]
+dotnet_diagnostic.CA1707.severity = none     # Underscores in identifiers — required by Method_Scenario_Expected test names

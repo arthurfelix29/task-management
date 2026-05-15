@@ -6,7 +6,7 @@ namespace TaskList.UnitTests.Domain;
 public sealed class ResultTests
 {
     [Fact]
-    public void Success_CarriesValue()
+    public void When_CreatingSuccessResult_Should_CarryValueAndNoError()
     {
         Result<int> result = Result.Success(42);
 
@@ -17,7 +17,7 @@ public sealed class ResultTests
     }
 
     [Fact]
-    public void Failure_ExposesError()
+    public void When_CreatingFailureResult_Should_ExposeProvidedError()
     {
         var error = DomainError.NotFound("task.not_found", "Task was not found.");
 
@@ -29,7 +29,7 @@ public sealed class ResultTests
     }
 
     [Fact]
-    public void Value_OnFailure_Throws()
+    public void When_AccessingValueOnFailure_Should_ThrowInvalidOperation()
     {
         var result = Result.Failure<int>(DomainError.NotFound("x", "y"));
 
@@ -37,7 +37,7 @@ public sealed class ResultTests
     }
 
     [Fact]
-    public void ImplicitConversion_FromValue_ReturnsSuccess()
+    public void When_AssigningValueToGenericResult_Should_ProduceSuccess()
     {
         Result<string> result = "hello";
 
@@ -46,7 +46,7 @@ public sealed class ResultTests
     }
 
     [Fact]
-    public void ImplicitConversion_FromError_ReturnsFailure()
+    public void When_AssigningErrorToGenericResult_Should_ProduceFailure()
     {
         Result<string> result = DomainError.Conflict("conflict.code", "Conflict description.");
 
@@ -55,7 +55,7 @@ public sealed class ResultTests
     }
 
     [Fact]
-    public void ImplicitConversion_FromError_ToNonGenericResult_ReturnsFailure()
+    public void When_AssigningErrorToNonGenericResult_Should_ProduceFailure()
     {
         Result result = DomainError.NotFound("task.not_found", "Task was not found.");
 

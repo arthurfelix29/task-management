@@ -21,10 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TaskList.Api\TaskList.Api.csproj" />
-    <ProjectReference Include="..\..\src\TaskList.Application\TaskList.Application.csproj" />
     <ProjectReference Include="..\..\src\TaskList.Domain\TaskList.Domain.csproj" />
-    <ProjectReference Include="..\..\src\TaskList.Infrastructure\TaskList.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

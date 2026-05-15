@@ -10,7 +10,7 @@ public sealed class TaskItemTests
     private readonly FakeTimeProvider _clock = new(Now);
 
     [Fact]
-    public void Create_WithValidTitle_SetsExpectedDefaults()
+    public void When_CreatingWithValidTitle_Should_InitializeWithDefaults()
     {
         var task = TaskItem.Create("Buy milk", _clock);
 
@@ -21,28 +21,24 @@ public sealed class TaskItemTests
     }
 
     [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData("   ")]
-    public void Create_WithBlankTitle_ThrowsArgumentException(string title)
+    [InlineData("", "empty string is rejected")]
+    [InlineData("   ", "whitespace-only is rejected")]
+    [InlineData(null, "null is rejected")]
+    public void When_CreatingWithInvalidTitle_Should_RejectConstruction(string? title, string scenario)
     {
-        Should.Throw<ArgumentException>(() => TaskItem.Create(title, _clock));
+        _ = scenario;
+
+        Should.Throw<ArgumentException>(() => TaskItem.Create(title!, _clock));
     }
 
     [Fact]
-    public void Create_WithNullTitle_ThrowsArgumentNullException()
-    {
-        Should.Throw<ArgumentNullException>(() => TaskItem.Create(null!, _clock));
-    }
-
-    [Fact]
-    public void Create_WithNullClock_ThrowsArgumentNullException()
+    public void When_CreatingWithNullClock_Should_RejectConstruction()
     {
         Should.Throw<ArgumentNullException>(() => TaskItem.Create("Buy milk", null!));
     }
 
     [Fact]
-    public void Toggle_FromIncomplete_MarksCompleted()
+    public void When_TogglingPendingTask_Should_MarkAsCompleted()
     {
         var task = TaskItem.Create("Write tests", _clock);
 
@@ -52,7 +48,7 @@ public sealed class TaskItemTests
     }
 
     [Fact]
-    public void Toggle_FromCompleted_MarksIncomplete()
+    public void When_TogglingCompletedTask_Should_RevertToPending()
     {
         var task = TaskItem.Create("Write tests", _clock);
         task.Toggle();

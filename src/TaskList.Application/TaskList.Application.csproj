@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\TaskList.Domain\TaskList.Domain.csproj" />
+  </ItemGroup>
+</Project>

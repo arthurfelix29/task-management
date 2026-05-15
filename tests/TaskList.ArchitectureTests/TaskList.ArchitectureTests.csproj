@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3.mtp-v2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TaskList.Api\TaskList.Api.csproj" />
+    <ProjectReference Include="..\..\src\TaskList.Application\TaskList.Application.csproj" />
+    <ProjectReference Include="..\..\src\TaskList.Domain\TaskList.Domain.csproj" />
+    <ProjectReference Include="..\..\src\TaskList.Infrastructure\TaskList.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -6,6 +6,9 @@
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="AspNetCore.HealthChecks.Sqlite" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Scrutor" />
   </ItemGroup>
 
   <ItemGroup>

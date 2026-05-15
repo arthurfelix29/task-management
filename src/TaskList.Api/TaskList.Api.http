@@ -1,0 +1,42 @@
+@host = http://localhost:5099
+@taskId = REPLACE_AFTER_CREATE
+
+### List all tasks
+GET {{host}}/api/v1/tasks
+Accept: application/json
+
+### Create a task
+# Copy the returned id into the @taskId variable above.
+POST {{host}}/api/v1/tasks
+Content-Type: application/json
+
+{
+  "title": "Write release notes"
+}
+
+### Get a single task
+GET {{host}}/api/v1/tasks/{{taskId}}
+Accept: application/json
+
+### Toggle completion
+POST {{host}}/api/v1/tasks/{{taskId}}/toggle
+
+### Delete a task
+DELETE {{host}}/api/v1/tasks/{{taskId}}
+
+### Liveness probe
+GET {{host}}/health/live
+
+### Readiness probe
+GET {{host}}/health/ready
+
+### Validation failure — empty title returns 422
+POST {{host}}/api/v1/tasks
+Content-Type: application/json
+
+{
+  "title": ""
+}
+
+### Not found — random id returns 404 ProblemDetails
+GET {{host}}/api/v1/tasks/00000000-0000-0000-0000-000000000000

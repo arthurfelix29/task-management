@@ -1,9 +1,11 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 using TaskList.Api.Common.Endpoints;
 using TaskList.Api.Common.Middleware;
+using TaskList.Application.Abstractions;
 using TaskList.Infrastructure;
 using TaskList.Infrastructure.Persistence;
 
@@ -19,6 +21,16 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddEndpointGroups();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>(includeInternalTypes: true);
+
+builder.Services.Scan(scan => scan
+    .FromAssemblyOf<Program>()
+    .AddClasses(c => c.AssignableTo(typeof(ICommandHandler<,>)))
+    .AsImplementedInterfaces()
+    .WithScopedLifetime()
+    .AddClasses(c => c.AssignableTo(typeof(IQueryHandler<,>)))
+    .AsImplementedInterfaces()
+    .WithScopedLifetime());
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Data Source=tasklist.db";

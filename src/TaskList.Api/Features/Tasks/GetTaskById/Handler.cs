@@ -12,12 +12,10 @@ public sealed class GetTaskByIdHandler(AppDbContext db)
 {
     public async Task<Result<TaskResponse>> HandleAsync(GetTaskByIdQuery query, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(query);
+        Guard.Against.Null(query);
 
         var task = await db.Tasks
-            .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.Id == query.Id, cancellationToken)
-            .ConfigureAwait(false);
+            .FirstOrDefaultAsync(t => t.Id == query.Id, cancellationToken);
 
         if (task is null)
         {

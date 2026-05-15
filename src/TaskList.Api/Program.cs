@@ -40,15 +40,10 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-var scope = app.Services.CreateAsyncScope();
-try
+await using (var scope = app.Services.CreateAsyncScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync().ConfigureAwait(false);
-}
-finally
-{
-    await scope.DisposeAsync().ConfigureAwait(false);
+    await db.Database.MigrateAsync();
 }
 
 app.UseExceptionHandler();
@@ -71,7 +66,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
     Predicate = check => check.Tags.Contains("ready"),
 });
 
-await app.RunAsync().ConfigureAwait(false);
+await app.RunAsync();
 
 public partial class Program
 {

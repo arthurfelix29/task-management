@@ -11,7 +11,7 @@ using TaskList.Infrastructure.Persistence;
 namespace TaskList.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260515011915_Initial")]
+    [Migration("20260515024229_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -25,8 +25,8 @@ namespace TaskList.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("INTEGER");

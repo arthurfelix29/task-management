@@ -9,6 +9,7 @@
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Scrutor" />
+    <PackageReference Include="Ardalis.GuardClauses" />
   </ItemGroup>
 
   <ItemGroup>

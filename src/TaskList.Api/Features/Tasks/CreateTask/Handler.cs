@@ -11,12 +11,12 @@ public sealed class CreateTaskHandler(AppDbContext db, TimeProvider clock)
 {
     public async Task<Result<TaskResponse>> HandleAsync(CreateTaskCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(command);
+        Guard.Against.Null(command);
 
         var task = TaskItem.Create(command.Title, clock);
 
         db.Tasks.Add(task);
-        await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await db.SaveChangesAsync(cancellationToken);
 
         return TaskResponse.From(task);
     }

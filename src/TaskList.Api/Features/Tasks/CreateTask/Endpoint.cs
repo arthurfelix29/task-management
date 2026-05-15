@@ -2,7 +2,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using TaskList.Api.Common.Endpoints;
 using TaskList.Api.Common.Extensions;
-using TaskList.Api.Common.Routes;
+using TaskList.Api.Common;
 using TaskList.Api.Features.Tasks.Mapping;
 using TaskList.Application.Abstractions;
 using TaskList.Domain.Common;
@@ -13,10 +13,10 @@ public sealed class CreateTaskEndpoint : IEndpointGroup
 {
     public void Map(IEndpointRouteBuilder app)
     {
-        ArgumentNullException.ThrowIfNull(app);
+        Guard.Against.Null(app);
 
-        app.MapPost(RouteConsts.TasksRoute, HandleAsync)
-            .WithName(RouteConsts.Names.CreateTask)
+        app.MapPost(Routes.Tasks.Create, HandleAsync)
+            .WithName(RouteNames.Tasks.Create)
             .WithTags("Tasks")
             .AllowAnonymous()
             .Produces<TaskResponse>(StatusCodes.Status201Created)
@@ -31,7 +31,7 @@ public sealed class CreateTaskEndpoint : IEndpointGroup
         HttpContext httpContext,
         CancellationToken cancellationToken)
     {
-        var validation = await validator.ValidateAsync(command, cancellationToken).ConfigureAwait(false);
+        var validation = await validator.ValidateAsync(command, cancellationToken);
         if (!validation.IsValid)
         {
             return TypedResults.Problem(new HttpValidationProblemDetails(validation.ToDictionary())
@@ -42,14 +42,14 @@ public sealed class CreateTaskEndpoint : IEndpointGroup
             });
         }
 
-        var result = await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
+        var result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
         {
             return result.ToProblemDetails();
         }
 
         var task = result.Value with { Links = TaskLinks.ForItem(links, httpContext, result.Value.Id) };
-        var location = links.GetUriByName(httpContext, RouteConsts.Names.GetTaskById, new { id = task.Id });
+        var location = links.GetUriByName(httpContext, RouteNames.Tasks.GetById, new { id = task.Id });
 
         return TypedResults.Created(location, task);
     }

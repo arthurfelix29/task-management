@@ -8,20 +8,20 @@ public sealed class ResultTests
     [Fact]
     public void Success_CarriesValue()
     {
-        Result<int> result = Result<int>.Success(42);
+        Result<int> result = Result.Success(42);
 
         result.IsSuccess.ShouldBeTrue();
         result.IsFailure.ShouldBeFalse();
         result.Value.ShouldBe(42);
-        result.Error.ShouldBe(Error.None);
+        result.Error.ShouldBe(DomainError.None);
     }
 
     [Fact]
     public void Failure_ExposesError()
     {
-        var error = Error.NotFound("task.not_found", "Task was not found.");
+        var error = DomainError.NotFound("task.not_found", "Task was not found.");
 
-        Result<int> result = Result<int>.Failure(error);
+        Result<int> result = Result.Failure<int>(error);
 
         result.IsSuccess.ShouldBeFalse();
         result.IsFailure.ShouldBeTrue();
@@ -31,7 +31,7 @@ public sealed class ResultTests
     [Fact]
     public void Value_OnFailure_Throws()
     {
-        var result = Result<int>.Failure(Error.NotFound("x", "y"));
+        var result = Result.Failure<int>(DomainError.NotFound("x", "y"));
 
         Should.Throw<InvalidOperationException>(() => result.Value);
     }
@@ -48,9 +48,19 @@ public sealed class ResultTests
     [Fact]
     public void ImplicitConversion_FromError_ReturnsFailure()
     {
-        Result<string> result = Error.Conflict("conflict.code", "Conflict description.");
+        Result<string> result = DomainError.Conflict("conflict.code", "Conflict description.");
 
         result.IsFailure.ShouldBeTrue();
         result.Error.Type.ShouldBe(ErrorType.Conflict);
+    }
+
+    [Fact]
+    public void ImplicitConversion_FromError_ToNonGenericResult_ReturnsFailure()
+    {
+        Result result = DomainError.NotFound("task.not_found", "Task was not found.");
+
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Type.ShouldBe(ErrorType.NotFound);
+        result.Error.Code.ShouldBe("task.not_found");
     }
 }

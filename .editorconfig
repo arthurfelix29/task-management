@@ -149,7 +149,8 @@ dotnet_diagnostic.IDE0011.severity = warning  # Add braces — warns only on mul
 # ─────────────────────────────────────────────────────────────
 
 # Meziantou — promote to error the rules that catch banned patterns
-dotnet_diagnostic.MA0004.severity = error    # Use ConfigureAwait or pass cancellation token
+# MA0004 — ASP.NET Core has no SynchronizationContext — ConfigureAwait is library-defensive code, not app code.
+dotnet_diagnostic.MA0004.severity = none
 dotnet_diagnostic.MA0040.severity = error    # Forward CancellationToken
 dotnet_diagnostic.MA0042.severity = error    # Do not use blocking calls in async method
 dotnet_diagnostic.MA0079.severity = error    # Use Task.WhenAll

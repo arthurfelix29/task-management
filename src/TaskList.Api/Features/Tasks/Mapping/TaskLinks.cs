@@ -1,4 +1,4 @@
-using TaskList.Api.Common.Routes;
+using TaskList.Api.Common;
 
 namespace TaskList.Api.Features.Tasks.Mapping;
 
@@ -6,26 +6,26 @@ internal static class TaskLinks
 {
     public static IReadOnlyList<LinkResponse> ForItem(LinkGenerator links, HttpContext httpContext, Guid id)
     {
-        ArgumentNullException.ThrowIfNull(links);
-        ArgumentNullException.ThrowIfNull(httpContext);
+        Guard.Against.Null(links);
+        Guard.Against.Null(httpContext);
 
         return
         [
-            new LinkResponse(Build(links, httpContext, RouteConsts.Names.GetTaskById, new { id }), "self", HttpMethods.Get),
-            new LinkResponse(Build(links, httpContext, RouteConsts.Names.ToggleTask, new { id }), "toggle", HttpMethods.Post),
-            new LinkResponse(Build(links, httpContext, RouteConsts.Names.DeleteTask, new { id }), "delete", HttpMethods.Delete),
+            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.GetById, new { id }), "self", HttpMethods.Get),
+            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.Toggle, new { id }), "toggle", HttpMethods.Post),
+            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.Delete, new { id }), "delete", HttpMethods.Delete),
         ];
     }
 
     public static IReadOnlyList<LinkResponse> ForCollection(LinkGenerator links, HttpContext httpContext)
     {
-        ArgumentNullException.ThrowIfNull(links);
-        ArgumentNullException.ThrowIfNull(httpContext);
+        Guard.Against.Null(links);
+        Guard.Against.Null(httpContext);
 
         return
         [
-            new LinkResponse(Build(links, httpContext, RouteConsts.Names.ListTasks, null), "self", HttpMethods.Get),
-            new LinkResponse(Build(links, httpContext, RouteConsts.Names.CreateTask, null), "create", HttpMethods.Post),
+            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.List, null), "self", HttpMethods.Get),
+            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.Create, null), "create", HttpMethods.Post),
         ];
     }
 

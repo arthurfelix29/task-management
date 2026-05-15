@@ -13,8 +13,8 @@ public sealed class GlobalExceptionHandler(
         Exception exception,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(httpContext);
-        ArgumentNullException.ThrowIfNull(exception);
+        Guard.Against.Null(httpContext);
+        Guard.Against.Null(exception);
 
         logger.LogError(
             exception,
@@ -46,6 +46,6 @@ public sealed class GlobalExceptionHandler(
                 Type = $"https://datatracker.ietf.org/doc/html/rfc9110#name-{statusCode}",
                 Detail = detail,
             },
-        }).ConfigureAwait(false);
+        });
     }
 }

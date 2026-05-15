@@ -8,7 +8,7 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
 {
     public void Configure(EntityTypeBuilder<TaskItem> builder)
     {
-        ArgumentNullException.ThrowIfNull(builder);
+        Guard.Against.Null(builder);
 
         builder.HasKey(t => t.Id);
 
@@ -21,6 +21,7 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
             .IsRequired();
 
         builder.Property(t => t.CreatedAt)
+            .HasConversion(dto => dto.UtcTicks, ticks => new DateTimeOffset(ticks, TimeSpan.Zero))
             .IsRequired();
 
         builder.HasIndex(t => t.CreatedAt);

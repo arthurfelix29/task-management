@@ -12,11 +12,11 @@ public sealed class ToggleTaskHandler(AppDbContext db)
 {
     public async Task<Result<TaskResponse>> HandleAsync(ToggleTaskCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(command);
+        Guard.Against.Null(command);
 
         var task = await db.Tasks
-            .FirstOrDefaultAsync(t => t.Id == command.Id, cancellationToken)
-            .ConfigureAwait(false);
+            .AsTracking()
+            .FirstOrDefaultAsync(t => t.Id == command.Id, cancellationToken);
 
         if (task is null)
         {
@@ -24,7 +24,7 @@ public sealed class ToggleTaskHandler(AppDbContext db)
         }
 
         task.Toggle();
-        await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await db.SaveChangesAsync(cancellationToken);
 
         return TaskResponse.From(task);
     }

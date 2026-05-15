@@ -14,15 +14,9 @@ public sealed class ListTasksHandler(AppDbContext db)
         CancellationToken cancellationToken)
     {
         var tasks = await db.Tasks
-            .AsNoTracking()
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        var ordered = tasks
             .OrderByDescending(t => t.CreatedAt)
-            .Select(TaskResponse.From)
-            .ToList();
+            .ToListAsync(cancellationToken);
 
-        return Result<IReadOnlyList<TaskResponse>>.Success(ordered);
+        return Result.Success<IReadOnlyList<TaskResponse>>(tasks.ConvertAll(TaskResponse.From));
     }
 }

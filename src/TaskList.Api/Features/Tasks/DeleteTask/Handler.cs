@@ -10,15 +10,14 @@ public sealed class DeleteTaskHandler(AppDbContext db) : ICommandHandler<DeleteT
 {
     public async Task<Result> HandleAsync(DeleteTaskCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(command);
+        Guard.Against.Null(command);
 
         var deleted = await db.Tasks
             .Where(t => t.Id == command.Id)
-            .ExecuteDeleteAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .ExecuteDeleteAsync(cancellationToken);
 
         return deleted == 0
-            ? Result.Failure(TaskErrors.NotFound(command.Id))
+            ? TaskErrors.NotFound(command.Id)
             : Result.Success();
     }
 }

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using TaskList.Api.Common.Endpoints;
 using TaskList.Api.Common.Extensions;
-using TaskList.Api.Common.Routes;
+using TaskList.Api.Common;
 using TaskList.Application.Abstractions;
 using TaskList.Domain.Common;
 using TaskList.Domain.Tasks;
@@ -12,10 +12,10 @@ public sealed class DeleteTaskEndpoint : IEndpointGroup
 {
     public void Map(IEndpointRouteBuilder app)
     {
-        ArgumentNullException.ThrowIfNull(app);
+        Guard.Against.Null(app);
 
-        app.MapDelete(RouteConsts.TaskByIdRoute, HandleAsync)
-            .WithName(RouteConsts.Names.DeleteTask)
+        app.MapDelete(Routes.Tasks.Delete, HandleAsync)
+            .WithName(RouteNames.Tasks.Delete)
             .WithTags("Tasks")
             .AllowAnonymous()
             .Produces(StatusCodes.Status204NoContent)
@@ -27,7 +27,7 @@ public sealed class DeleteTaskEndpoint : IEndpointGroup
         ICommandHandler<DeleteTaskCommand, Result> handler,
         CancellationToken cancellationToken)
     {
-        var result = await handler.HandleAsync(new DeleteTaskCommand(new TaskId(id)), cancellationToken).ConfigureAwait(false);
+        var result = await handler.HandleAsync(new DeleteTaskCommand(new TaskId(id)), cancellationToken);
         return result.IsFailure
             ? result.ToProblemDetails()
             : TypedResults.NoContent();

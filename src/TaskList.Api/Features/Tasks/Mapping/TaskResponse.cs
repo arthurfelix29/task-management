@@ -11,7 +11,7 @@ public sealed record TaskResponse(
 {
     public static TaskResponse From(TaskItem task)
     {
-        ArgumentNullException.ThrowIfNull(task);
+        Guard.Against.Null(task);
         return new TaskResponse(task.Id, task.Title, task.IsCompleted, task.CreatedAt, []);
     }
 }

@@ -7,7 +7,7 @@ public static class ResultExtensions
 {
     public static ProblemHttpResult ToProblemDetails(this Result result)
     {
-        ArgumentNullException.ThrowIfNull(result);
+        Guard.Against.Null(result);
 
         if (result.IsSuccess)
         {

@@ -9,8 +9,8 @@ internal static class TaskSeeder
 
     public static IReadOnlyList<TaskItem> Generate(TimeProvider clock, int count)
     {
-        ArgumentNullException.ThrowIfNull(clock);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
+        Guard.Against.Null(clock);
+        Guard.Against.NegativeOrZero(count);
 
         Randomizer.Seed = new Random(SeedRandomizerSeed);
         var faker = new Faker("en");

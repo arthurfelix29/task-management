@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using TaskList.Api.Common.Endpoints;
 using TaskList.Api.Common.Extensions;
-using TaskList.Api.Common.Routes;
+using TaskList.Api.Common;
 using TaskList.Api.Features.Tasks.Mapping;
 using TaskList.Application.Abstractions;
 using TaskList.Domain.Common;
@@ -13,10 +13,10 @@ public sealed class ToggleTaskEndpoint : IEndpointGroup
 {
     public void Map(IEndpointRouteBuilder app)
     {
-        ArgumentNullException.ThrowIfNull(app);
+        Guard.Against.Null(app);
 
-        app.MapPost(RouteConsts.ToggleTaskRoute, HandleAsync)
-            .WithName(RouteConsts.Names.ToggleTask)
+        app.MapPost(Routes.Tasks.Toggle, HandleAsync)
+            .WithName(RouteNames.Tasks.Toggle)
             .WithTags("Tasks")
             .AllowAnonymous()
             .Produces<TaskResponse>()
@@ -30,7 +30,7 @@ public sealed class ToggleTaskEndpoint : IEndpointGroup
         HttpContext httpContext,
         CancellationToken cancellationToken)
     {
-        var result = await handler.HandleAsync(new ToggleTaskCommand(new TaskId(id)), cancellationToken).ConfigureAwait(false);
+        var result = await handler.HandleAsync(new ToggleTaskCommand(new TaskId(id)), cancellationToken);
         if (result.IsFailure)
         {
             return result.ToProblemDetails();

@@ -4,7 +4,7 @@ public static class EndpointGroupExtensions
 {
     public static IServiceCollection AddEndpointGroups(this IServiceCollection services)
     {
-        ArgumentNullException.ThrowIfNull(services);
+        Guard.Against.Null(services);
 
         var groups = typeof(EndpointGroupExtensions).Assembly
             .GetTypes()
@@ -20,7 +20,7 @@ public static class EndpointGroupExtensions
 
     public static IEndpointRouteBuilder MapEndpointGroups(this IEndpointRouteBuilder app)
     {
-        ArgumentNullException.ThrowIfNull(app);
+        Guard.Against.Null(app);
 
         foreach (var group in app.ServiceProvider.GetServices<IEndpointGroup>())
         {

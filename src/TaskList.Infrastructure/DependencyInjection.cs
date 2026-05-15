@@ -14,8 +14,8 @@ public static class DependencyInjection
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        ArgumentNullException.ThrowIfNull(services);
-        ArgumentNullException.ThrowIfNull(configuration);
+        Guard.Against.Null(services);
+        Guard.Against.Null(configuration);
 
         services.TryAddSingleton(TimeProvider.System);
 
@@ -28,15 +28,15 @@ public static class DependencyInjection
 
             options.UseAsyncSeeding(async (context, _, ct) =>
             {
-                if (await context.Set<TaskItem>().AnyAsync(ct).ConfigureAwait(false))
+                if (await context.Set<TaskItem>().AnyAsync(ct))
                 {
                     return;
                 }
 
                 var clock = sp.GetRequiredService<TimeProvider>();
                 var seed = TaskSeeder.Generate(clock, SeedTaskCount);
-                await context.Set<TaskItem>().AddRangeAsync(seed, ct).ConfigureAwait(false);
-                await context.SaveChangesAsync(ct).ConfigureAwait(false);
+                await context.Set<TaskItem>().AddRangeAsync(seed, ct);
+                await context.SaveChangesAsync(ct);
             });
 
             options.UseSeeding((context, _) =>

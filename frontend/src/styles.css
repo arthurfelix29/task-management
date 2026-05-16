@@ -16,6 +16,7 @@
   --color-danger: #dc2626;
   --color-danger-hover: #b91c1c;
   --color-danger-foreground: #ffffff;
+  --color-danger-subtle: #fee2e2;
   --color-success: #16a34a;
   --color-focus-ring: #3b82f6;
 }
@@ -33,6 +34,7 @@
     --color-primary-hover: #2563eb;
     --color-danger: #ef4444;
     --color-danger-hover: #dc2626;
+    --color-danger-subtle: rgba(239, 68, 68, 0.18);
     --color-success: #22c55e;
   }
 

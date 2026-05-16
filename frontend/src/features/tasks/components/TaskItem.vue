@@ -53,7 +53,7 @@ function onCancelDelete() {
 </script>
 
 <template>
-  <li class="flex items-center gap-3 rounded-md border border-border bg-surface px-3 py-2 shadow-sm">
+  <li class="group flex items-center gap-3 rounded-md border border-border bg-surface px-3 py-2 shadow-sm">
     <Checkbox
       :model-value="task.isCompleted"
       :label="`Mark ${task.title} as ${task.isCompleted ? 'pending' : 'completed'}`"
@@ -65,14 +65,14 @@ function onCancelDelete() {
       <p class="text-xs text-muted-foreground">{{ createdAtLabel }}</p>
     </div>
     <Button
-      variant="danger"
-      size="sm"
+      variant="ghost"
+      size="icon"
       :disabled="!canDelete"
       :aria-label="`Delete task: ${task.title}`"
+      class="opacity-0 transition-opacity duration-150 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-60"
       @click="onDeleteClick"
     >
       <Trash2 class="h-4 w-4" aria-hidden="true" />
-      <span class="ml-1.5">Delete</span>
     </Button>
 
     <ConfirmDeleteModal

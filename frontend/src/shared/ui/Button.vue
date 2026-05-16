@@ -13,13 +13,14 @@ const button = cva(
     variants: {
       variant: {
         primary: 'bg-primary text-primary-foreground hover:bg-primary-hover focus-visible:outline-focus-ring',
-        secondary: 'border border-border-strong bg-surface text-foreground hover:bg-surface-elevated focus-visible:outline-focus-ring',
-        danger: 'text-danger hover:bg-surface-elevated focus-visible:outline-danger',
-        ghost: 'text-muted-foreground hover:bg-surface-elevated hover:text-foreground focus-visible:outline-focus-ring',
+        secondary: 'border border-border-strong bg-transparent text-foreground hover:bg-surface-elevated focus-visible:outline-focus-ring',
+        destructive: 'bg-danger text-danger-foreground hover:bg-danger-hover focus-visible:outline-danger',
+        ghost: 'bg-transparent text-muted-foreground hover:bg-surface-elevated hover:text-foreground focus-visible:outline-focus-ring',
       },
       size: {
         sm: 'px-3 py-1.5 text-sm',
         md: 'px-4 py-2 text-sm',
+        icon: 'h-9 w-9 p-0',
       },
     },
     defaultVariants: {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { X } from '@lucide/vue'
 import { useToast } from '@/composables/useToast'
 import { cn } from '@/shared/lib/cn'
 
@@ -37,7 +38,7 @@ function classesFor(kind: 'success' | 'error' | 'info') {
         class="text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
         @click="dismiss(t.id)"
       >
-        ×
+        <X class="h-4 w-4" aria-hidden="true" />
       </button>
     </div>
   </div>

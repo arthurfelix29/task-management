@@ -26,11 +26,12 @@ describe('TaskItem', () => {
     expect(emitted('toggle')).toEqual([['task-1']])
   })
 
-  it('When_ClickingDeleteButton_Should_EmitRemoveWithTaskId', async () => {
+  it('When_ConfirmingDeleteInModal_Should_EmitRemoveWithTaskId', async () => {
     const user = userEvent.setup()
     const { emitted } = render(TaskItem, { props: { task: baseTask } })
 
     await user.click(screen.getByRole('button', { name: /delete task: buy groceries/i }))
+    await user.click(await screen.findByRole('button', { name: /^delete$/i }))
 
     expect(emitted('remove')).toEqual([['task-1']])
   })

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Moon, Sun } from '@lucide/vue'
 import TaskList from '@/features/tasks/components/TaskList.vue'
 import Toast from '@/shared/ui/Toast.vue'
 import Button from '@/shared/ui/Button.vue'
@@ -23,7 +24,8 @@ const { theme, toggle } = useTheme()
         :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
         @click="toggle"
       >
-        {{ theme === 'dark' ? 'Light' : 'Dark' }}
+        <Sun v-if="theme === 'dark'" class="h-4 w-4" aria-hidden="true" />
+        <Moon v-else class="h-4 w-4" aria-hidden="true" />
       </Button>
     </header>
     <TaskList />

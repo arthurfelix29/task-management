@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
+import { Plus } from '@lucide/vue'
 import Button from '@/shared/ui/Button.vue'
 import Input from '@/shared/ui/Input.vue'
 import { createTaskSchema, type CreateTaskInput } from '@/features/tasks/schemas/task.schema'
@@ -70,7 +71,8 @@ function onEscape() {
         />
       </div>
       <Button type="submit" :disabled="isSubmitting">
-        {{ isSubmitting ? 'Adding…' : 'Add' }}
+        <Plus v-if="!isSubmitting" class="h-4 w-4" aria-hidden="true" />
+        <span :class="{ 'ml-1.5': !isSubmitting }">{{ isSubmitting ? 'Adding…' : 'Add' }}</span>
       </Button>
     </div>
     <p

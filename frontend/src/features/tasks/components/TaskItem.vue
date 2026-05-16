@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { Trash2 } from '@lucide/vue'
 import Button from '@/shared/ui/Button.vue'
 import Checkbox from '@/shared/ui/Checkbox.vue'
+import ConfirmDeleteModal from '@/features/tasks/components/ConfirmDeleteModal.vue'
 import type { Task } from '@/features/tasks/types/task'
 import { cn } from '@/shared/lib/cn'
 
@@ -33,6 +35,21 @@ const createdAtLabel = computed(() => {
     timeStyle: 'short',
   }).format(date)
 })
+
+const modalOpen = ref(false)
+
+function onDeleteClick() {
+  modalOpen.value = true
+}
+
+function onConfirmDelete() {
+  modalOpen.value = false
+  emit('remove', props.task.id)
+}
+
+function onCancelDelete() {
+  modalOpen.value = false
+}
 </script>
 
 <template>
@@ -52,9 +69,17 @@ const createdAtLabel = computed(() => {
       size="sm"
       :disabled="!canDelete"
       :aria-label="`Delete task: ${task.title}`"
-      @click="emit('remove', task.id)"
+      @click="onDeleteClick"
     >
-      Delete
+      <Trash2 class="h-4 w-4" aria-hidden="true" />
+      <span class="ml-1.5">Delete</span>
     </Button>
+
+    <ConfirmDeleteModal
+      :open="modalOpen"
+      :task-title="task.title"
+      @confirm="onConfirmDelete"
+      @cancel="onCancelDelete"
+    />
   </li>
 </template>

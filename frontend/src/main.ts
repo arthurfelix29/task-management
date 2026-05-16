@@ -8,10 +8,4 @@ applyInitialTheme()
 
 const app = createApp(App)
 app.use(createPinia())
-
-if (import.meta.env.DEV) {
-  const VueAxe = await import('vue-axe')
-  app.use(VueAxe.default)
-}
-
 app.mount('#app')

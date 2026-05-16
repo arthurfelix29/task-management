@@ -20,28 +20,31 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="space-y-4" :aria-busy="store.loading">
+  <section class="space-y-8" :aria-busy="store.loading">
     <SearchBar />
-    <CreateTaskForm />
 
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <TaskFilters :model-value="filter" @update:model-value="store.setFilter($event)" />
-      <TaskCountFooter :completed="completedCount" :total="totalCount" />
+    <div class="space-y-4">
+      <CreateTaskForm />
+
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <TaskFilters :model-value="filter" @update:model-value="store.setFilter($event)" />
+        <TaskCountFooter :completed="completedCount" :total="totalCount" />
+      </div>
+
+      <LoadingState v-if="viewState.kind === 'loading'" />
+      <ErrorState
+        v-else-if="viewState.kind === 'error'"
+        :message="viewState.message"
+        :can-retry="viewState.canRetry"
+        @retry="store.loadAll()"
+      />
+      <EmptyState v-else-if="viewState.kind === 'empty'" :filter="viewState.filter" />
+      <TaskListItems
+        v-else
+        :tasks="viewState.tasks"
+        @toggle="store.toggle($event)"
+        @remove="store.remove($event)"
+      />
     </div>
-
-    <LoadingState v-if="viewState.kind === 'loading'" />
-    <ErrorState
-      v-else-if="viewState.kind === 'error'"
-      :message="viewState.message"
-      :can-retry="viewState.canRetry"
-      @retry="store.loadAll()"
-    />
-    <EmptyState v-else-if="viewState.kind === 'empty'" :filter="viewState.filter" />
-    <TaskListItems
-      v-else
-      :tasks="viewState.tasks"
-      @toggle="store.toggle($event)"
-      @remove="store.remove($event)"
-    />
   </section>
 </template>

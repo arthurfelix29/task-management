@@ -1,12 +1,8 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { tasksApi } from '@/features/tasks/composables/useTasksApi'
-import { matchesTask, parseSearch } from '@/features/tasks/lib/search-parser'
 import type { Task, TaskFilter } from '@/features/tasks/types/task'
 import { type ApiError, describeError } from '@/shared/lib/problem-details'
-
-const USER_LOCALE =
-  typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().locale : 'en-US'
 
 export type ViewState =
   | { kind: 'loading' }
@@ -35,12 +31,10 @@ export const useTasksStore = defineStore('tasks', () => {
         ? tasks.value
         : tasks.value.filter((t) => t.isCompleted === (filter.value === 'completed'))
 
-    const query = searchQuery.value.trim()
+    const query = searchQuery.value.trim().toLowerCase()
     if (query === '') return statusFiltered
 
-    const now = new Date()
-    const tokens = parseSearch(query, USER_LOCALE, now)
-    return statusFiltered.filter((t) => matchesTask(t, tokens, now))
+    return statusFiltered.filter((t) => t.title.toLowerCase().includes(query))
   })
 
   const completedCount = computed(() => tasks.value.filter((t) => t.isCompleted).length)

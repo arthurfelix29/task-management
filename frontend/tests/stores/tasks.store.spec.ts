@@ -112,4 +112,19 @@ describe('tasks store', () => {
     expect(store.tasks).toHaveLength(2)
     expect(store.error).toBe('Server crashed')
   })
+
+  it('When_SearchQueryMatchesTitle_Should_ReturnOnlyMatchingTasks', async () => {
+    const tasks = [
+      sampleTask({ id: 'a', title: 'Buy milk' }),
+      sampleTask({ id: 'b', title: 'Sell stocks' }),
+      sampleTask({ id: 'c', title: 'MILK delivery' }),
+    ]
+    server.use(http.get('/api/v1/tasks', () => HttpResponse.json(sampleListResponse(tasks))))
+
+    const store = useTasksStore()
+    await store.loadAll()
+    store.setSearchQuery('milk')
+
+    expect(store.filteredTasks.map((t) => t.id).sort()).toEqual(['a', 'c'])
+  })
 })

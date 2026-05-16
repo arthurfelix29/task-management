@@ -13,16 +13,21 @@ const store = useTasksStore()
 const toast = useToast()
 const inputRef = ref<InstanceType<typeof Input> | null>(null)
 
-const { defineField, handleSubmit, resetForm, errors, isSubmitting, setErrors } =
+const { defineField, handleSubmit, resetForm, errors, isSubmitting, setErrors, submitCount } =
   useForm<CreateTaskInput>({
     validationSchema: toTypedSchema(createTaskSchema),
     initialValues: { title: '' },
     validateOnMount: false,
   })
 
-const [title, titleAttrs] = defineField('title', {
-  validateOnBlur: true,
-  validateOnModelUpdate: false,
+const [title, titleAttrs] = defineField('title', () => {
+  const hasAttemptedSubmit = submitCount.value > 0
+  return {
+    validateOnBlur: hasAttemptedSubmit,
+    validateOnChange: hasAttemptedSubmit,
+    validateOnInput: false,
+    validateOnModelUpdate: hasAttemptedSubmit,
+  }
 })
 
 const onSubmit = handleSubmit(async (values) => {

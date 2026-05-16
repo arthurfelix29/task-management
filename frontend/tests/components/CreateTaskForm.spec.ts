@@ -34,6 +34,18 @@ describe('CreateTaskForm', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(/title is required/i)
   })
 
+  it('When_FieldClearedBeforeSubmit_ShouldNot_ShowRequiredError', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(CreateTaskForm)
+
+    const input = screen.getByLabelText(/new task/i)
+    await user.type(input, 'buy')
+    await user.clear(input)
+    await user.tab()
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
   it('When_SubmittingTitleOver200Chars_Should_DisplayMaxLengthError', async () => {
     const user = userEvent.setup()
     renderWithProviders(CreateTaskForm)

@@ -77,4 +77,25 @@ describe('CreateTaskForm', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/title is reserved/i)
   })
+
+  it('When_ApiReturns409Duplicate_Should_DisplayDuplicateErrorAndPreserveInput', async () => {
+    server.use(
+      http.post('/api/v1/tasks', () =>
+        HttpResponse.json(
+          { status: 409, title: 'Conflict', detail: "A task with the title 'Buy milk' already exists." },
+          { status: 409 },
+        ),
+      ),
+    )
+
+    const user = userEvent.setup()
+    renderWithProviders(CreateTaskForm, { testingPinia: false })
+
+    const input = screen.getByLabelText(/new task/i)
+    await user.type(input, 'Buy milk')
+    await user.click(screen.getByRole('button', { name: /add/i }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/already exists/i)
+    expect(input).toHaveValue('Buy milk')
+  })
 })

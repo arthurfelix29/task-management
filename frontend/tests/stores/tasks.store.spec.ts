@@ -114,6 +114,27 @@ describe('tasks store', () => {
     expect(store.error).toBe('Server crashed')
   })
 
+  it('When_CreateApiReturns409_Should_ReturnFieldErrorWithDuplicateMessage', async () => {
+    server.use(
+      http.post('/api/v1/tasks', () =>
+        HttpResponse.json(
+          { status: 409, title: 'Conflict', detail: "A task with the title 'X' already exists." },
+          { status: 409 },
+        ),
+      ),
+    )
+
+    const store = useTasksStore()
+    const outcome = await store.create('X')
+
+    expect(outcome).toEqual({
+      kind: 'field-error',
+      field: 'title',
+      message: 'A task with this title already exists.',
+    })
+    expect(store.tasks).toHaveLength(0)
+  })
+
   it('When_SearchQueryMatchesTitle_Should_ReturnOnlyMatchingTasks', async () => {
     const tasks = [
       sampleTask({ id: 'a', title: 'Buy milk' }),

@@ -41,7 +41,7 @@ function widthFor(id: number): string {
 <template>
   <div
     aria-live="polite"
-    class="pointer-events-none fixed bottom-4 right-4 z-50 flex w-full max-w-sm flex-col gap-2"
+    class="pointer-events-none fixed right-4 top-4 z-50 flex w-full max-w-sm flex-col gap-2"
   >
     <TransitionGroup
       enter-active-class="transition ease-out duration-150"

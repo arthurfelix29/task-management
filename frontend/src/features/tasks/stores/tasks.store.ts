@@ -22,12 +22,13 @@ export type ViewState =
   | { kind: 'empty'; filter: TaskFilter }
   | { kind: 'success'; tasks: Task[] }
 
-export class TaskValidationError extends Error {
-  constructor(public readonly fieldErrors: Record<string, string[]>) {
-    super('Validation failed')
-    this.name = 'TaskValidationError'
-  }
-}
+export type CreateTaskOutcome =
+  | { kind: 'ok' }
+  | { kind: 'field-error'; field: 'title'; message: string }
+  | { kind: 'failure' }
+
+const DUPLICATE_TITLE_MESSAGE = 'A task with this title already exists.'
+const GENERIC_VALIDATION_MESSAGE = 'The server rejected this title.'
 
 export const useTasksStore = defineStore('tasks', () => {
   const toast = useToast()
@@ -75,18 +76,23 @@ export const useTasksStore = defineStore('tasks', () => {
     loaded.value = true
   }
 
-  async function create(title: string) {
+  async function create(title: string): Promise<CreateTaskOutcome> {
     const result = await tasksApi.create({ title })
     if (result.kind === 'error') {
       if (isValidationError(result.error)) {
-        throw new TaskValidationError(result.error.problem.errors ?? {})
+        const fieldMessage = result.error.problem.errors?.['Title']?.join(', ')
+        return { kind: 'field-error', field: 'title', message: fieldMessage ?? GENERIC_VALIDATION_MESSAGE }
+      }
+      if (isDuplicateConflict(result.error)) {
+        return { kind: 'field-error', field: 'title', message: DUPLICATE_TITLE_MESSAGE }
       }
       error.value = describeError(result.error)
       if (result.error.kind === 'network') toast.error(NETWORK_ERROR_MESSAGE)
-      return
+      return { kind: 'failure' }
     }
     tasks.value = [result.data, ...tasks.value]
     toast.success('Task created')
+    return { kind: 'ok' }
   }
 
   async function toggle(id: string) {
@@ -186,6 +192,10 @@ function sortTasks(tasks: readonly Task[], option: SortOption): Task[] {
 
 function isValidationError(error: ApiError): error is Extract<ApiError, { kind: 'http' }> {
   return error.kind === 'http' && error.status === 422
+}
+
+function isDuplicateConflict(error: ApiError): error is Extract<ApiError, { kind: 'http' }> {
+  return error.kind === 'http' && error.status === 409
 }
 
 function isMissingResource(error: ApiError): boolean {

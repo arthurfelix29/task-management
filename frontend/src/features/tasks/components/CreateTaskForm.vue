@@ -5,8 +5,9 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { Plus } from '@lucide/vue'
 import Button from '@/shared/ui/Button.vue'
 import Input from '@/shared/ui/Input.vue'
+import FieldError from '@/shared/ui/FieldError.vue'
 import { createTaskSchema, type CreateTaskInput } from '@/features/tasks/schemas/task.schema'
-import { TaskValidationError, useTasksStore } from '@/features/tasks/stores/tasks.store'
+import { useTasksStore } from '@/features/tasks/stores/tasks.store'
 
 const store = useTasksStore()
 const inputRef = ref<InstanceType<typeof Input> | null>(null)
@@ -29,15 +30,16 @@ const [title, titleAttrs] = defineField('title', () => {
 })
 
 const onSubmit = handleSubmit(async (values) => {
-  try {
-    await store.create(values.title)
+  const outcome = await store.create(values.title)
+
+  if (outcome.kind === 'ok') {
     resetForm()
     focusInput()
-  } catch (err) {
-    if (err instanceof TaskValidationError) {
-      const fieldMessage = err.fieldErrors['Title']?.join(', ')
-      if (fieldMessage !== undefined) setErrors({ title: fieldMessage })
-    }
+    return
+  }
+
+  if (outcome.kind === 'field-error') {
+    setErrors({ [outcome.field]: outcome.message })
   }
 })
 
@@ -73,14 +75,6 @@ function onEscape() {
         <span :class="{ 'ml-1.5': !isSubmitting }">{{ isSubmitting ? 'Adding…' : 'Add' }}</span>
       </Button>
     </div>
-    <p
-      v-if="errors.title"
-      id="create-task-error"
-      role="alert"
-      aria-live="polite"
-      class="text-sm text-danger"
-    >
-      {{ errors.title }}
-    </p>
+    <FieldError id="create-task-error" :message="errors.title ?? ''" />
   </form>
 </template>

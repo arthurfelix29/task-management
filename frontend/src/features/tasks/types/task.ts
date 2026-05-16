@@ -23,3 +23,5 @@ export type CreateTaskRequest = {
 }
 
 export type TaskFilter = 'all' | 'active' | 'completed'
+
+export type SortOption = 'newest' | 'oldest' | 'name-asc' | 'name-desc'

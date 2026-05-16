@@ -6,6 +6,7 @@ import { sampleListResponse, sampleTask, server } from '../setup/msw'
 
 beforeEach(() => {
   setActivePinia(createPinia())
+  window.localStorage.removeItem('tasklist:sort')
 })
 
 afterEach(() => {
@@ -126,5 +127,48 @@ describe('tasks store', () => {
     store.setSearchQuery('milk')
 
     expect(store.filteredTasks.map((t) => t.id).sort()).toEqual(['a', 'c'])
+  })
+
+  describe('sort options', () => {
+    const sortFixtures = [
+      sampleTask({ id: 'old', title: 'apple', createdAt: '2026-01-01T00:00:00Z' }),
+      sampleTask({ id: 'new', title: 'Banana', createdAt: '2026-05-15T00:00:00Z' }),
+      sampleTask({ id: 'mid', title: 'cherry', createdAt: '2026-03-01T00:00:00Z' }),
+    ]
+
+    async function bootStoreWithFixtures() {
+      server.use(http.get('/api/v1/tasks', () => HttpResponse.json(sampleListResponse(sortFixtures))))
+      const store = useTasksStore()
+      await store.loadAll()
+      return store
+    }
+
+    it('When_SortByNewest_Should_OrderByCreatedAtDescending', async () => {
+      const store = await bootStoreWithFixtures()
+      store.setSortBy('newest')
+
+      expect(store.filteredTasks.map((t) => t.id)).toEqual(['new', 'mid', 'old'])
+    })
+
+    it('When_SortByOldest_Should_OrderByCreatedAtAscending', async () => {
+      const store = await bootStoreWithFixtures()
+      store.setSortBy('oldest')
+
+      expect(store.filteredTasks.map((t) => t.id)).toEqual(['old', 'mid', 'new'])
+    })
+
+    it('When_SortByNameAsc_Should_OrderAlphabeticallyCaseInsensitive', async () => {
+      const store = await bootStoreWithFixtures()
+      store.setSortBy('name-asc')
+
+      expect(store.filteredTasks.map((t) => t.title)).toEqual(['apple', 'Banana', 'cherry'])
+    })
+
+    it('When_SortByNameDesc_Should_OrderReverseAlphabeticallyCaseInsensitive', async () => {
+      const store = await bootStoreWithFixtures()
+      store.setSortBy('name-desc')
+
+      expect(store.filteredTasks.map((t) => t.title)).toEqual(['cherry', 'Banana', 'apple'])
+    })
   })
 })

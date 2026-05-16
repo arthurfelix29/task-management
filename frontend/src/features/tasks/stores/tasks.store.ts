@@ -1,8 +1,17 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { useStorage } from '@vueuse/core'
 import { tasksApi } from '@/features/tasks/composables/useTasksApi'
-import type { Task, TaskFilter } from '@/features/tasks/types/task'
+import type { SortOption, Task, TaskFilter } from '@/features/tasks/types/task'
 import { type ApiError, describeError } from '@/shared/lib/problem-details'
+
+const VALID_SORTS: readonly SortOption[] = ['newest', 'oldest', 'name-asc', 'name-desc']
+
+const sortSerializer = {
+  read: (raw: string): SortOption =>
+    (VALID_SORTS as readonly string[]).includes(raw) ? (raw as SortOption) : 'newest',
+  write: (value: SortOption) => value,
+}
 
 export type ViewState =
   | { kind: 'loading' }
@@ -23,6 +32,9 @@ export const useTasksStore = defineStore('tasks', () => {
   const error = ref<string | null>(null)
   const filter = ref<TaskFilter>('all')
   const searchQuery = ref('')
+  const sortBy = useStorage<SortOption>('tasklist:sort', 'newest', undefined, {
+    serializer: sortSerializer,
+  })
   const loaded = ref(false)
 
   const filteredTasks = computed(() => {
@@ -32,9 +44,10 @@ export const useTasksStore = defineStore('tasks', () => {
         : tasks.value.filter((t) => t.isCompleted === (filter.value === 'completed'))
 
     const query = searchQuery.value.trim().toLowerCase()
-    if (query === '') return statusFiltered
+    const titleFiltered =
+      query === '' ? statusFiltered : statusFiltered.filter((t) => t.title.toLowerCase().includes(query))
 
-    return statusFiltered.filter((t) => t.title.toLowerCase().includes(query))
+    return sortTasks(titleFiltered, sortBy.value)
   })
 
   const completedCount = computed(() => tasks.value.filter((t) => t.isCompleted).length)
@@ -111,6 +124,10 @@ export const useTasksStore = defineStore('tasks', () => {
     searchQuery.value = next
   }
 
+  function setSortBy(next: SortOption) {
+    sortBy.value = next
+  }
+
   function clearError() {
     error.value = null
   }
@@ -121,6 +138,7 @@ export const useTasksStore = defineStore('tasks', () => {
     error,
     filter,
     searchQuery,
+    sortBy,
     loaded,
     filteredTasks,
     completedCount,
@@ -132,9 +150,29 @@ export const useTasksStore = defineStore('tasks', () => {
     remove,
     setFilter,
     setSearchQuery,
+    setSortBy,
     clearError,
   }
 })
+
+function sortTasks(tasks: readonly Task[], option: SortOption): Task[] {
+  const sorted = [...tasks]
+  switch (option) {
+    case 'newest':
+      sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      break
+    case 'oldest':
+      sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      break
+    case 'name-asc':
+      sorted.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'accent' }))
+      break
+    case 'name-desc':
+      sorted.sort((a, b) => b.title.localeCompare(a.title, undefined, { sensitivity: 'accent' }))
+      break
+  }
+  return sorted
+}
 
 function isValidationError(error: ApiError): error is Extract<ApiError, { kind: 'http' }> {
   return error.kind === 'http' && error.status === 422

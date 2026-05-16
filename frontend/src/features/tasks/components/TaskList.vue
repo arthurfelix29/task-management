@@ -6,6 +6,7 @@ import SearchBar from '@/features/tasks/components/SearchBar.vue'
 import CreateTaskForm from '@/features/tasks/components/CreateTaskForm.vue'
 import TaskListItems from '@/features/tasks/components/TaskListItems.vue'
 import TaskFilters from '@/features/tasks/components/TaskFilters.vue'
+import SortDropdown from '@/features/tasks/components/SortDropdown.vue'
 import TaskCountFooter from '@/features/tasks/components/TaskCountFooter.vue'
 import EmptyState from '@/features/tasks/components/EmptyState.vue'
 import ErrorState from '@/features/tasks/components/ErrorState.vue'
@@ -20,7 +21,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="space-y-8" :aria-busy="store.loading">
+  <section class="space-y-12" :aria-busy="store.loading">
     <SearchBar />
 
     <div class="space-y-4">
@@ -28,7 +29,10 @@ onMounted(() => {
 
       <div class="flex flex-wrap items-center justify-between gap-2">
         <TaskFilters :model-value="filter" @update:model-value="store.setFilter($event)" />
-        <TaskCountFooter :completed="completedCount" :total="totalCount" />
+        <div class="flex items-center gap-3">
+          <SortDropdown />
+          <TaskCountFooter :completed="completedCount" :total="totalCount" />
+        </div>
       </div>
 
       <LoadingState v-if="viewState.kind === 'loading'" />

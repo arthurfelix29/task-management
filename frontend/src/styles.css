@@ -18,6 +18,11 @@
   --color-danger-foreground: #ffffff;
   --color-danger-subtle: #fee2e2;
   --color-success: #16a34a;
+  --color-success-foreground: #ffffff;
+  --color-success-subtle: #dcfce7;
+  --color-info: #2563eb;
+  --color-info-foreground: #ffffff;
+  --color-info-subtle: #dbeafe;
   --color-focus-ring: #3b82f6;
 }
 
@@ -36,6 +41,9 @@
     --color-danger-hover: #dc2626;
     --color-danger-subtle: rgba(239, 68, 68, 0.18);
     --color-success: #22c55e;
+    --color-success-subtle: rgba(34, 197, 94, 0.18);
+    --color-info: #3b82f6;
+    --color-info-subtle: rgba(59, 130, 246, 0.22);
   }
 
   body {

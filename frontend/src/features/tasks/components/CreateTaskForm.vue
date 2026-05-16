@@ -7,10 +7,8 @@ import Button from '@/shared/ui/Button.vue'
 import Input from '@/shared/ui/Input.vue'
 import { createTaskSchema, type CreateTaskInput } from '@/features/tasks/schemas/task.schema'
 import { TaskValidationError, useTasksStore } from '@/features/tasks/stores/tasks.store'
-import { useToast } from '@/composables/useToast'
 
 const store = useTasksStore()
-const toast = useToast()
 const inputRef = ref<InstanceType<typeof Input> | null>(null)
 
 const { defineField, handleSubmit, resetForm, errors, isSubmitting, setErrors, submitCount } =
@@ -35,16 +33,11 @@ const onSubmit = handleSubmit(async (values) => {
     await store.create(values.title)
     resetForm()
     focusInput()
-    toast.success('Task added.')
   } catch (err) {
     if (err instanceof TaskValidationError) {
       const fieldMessage = err.fieldErrors['Title']?.join(', ')
-      if (fieldMessage !== undefined) {
-        setErrors({ title: fieldMessage })
-        return
-      }
+      if (fieldMessage !== undefined) setErrors({ title: fieldMessage })
     }
-    toast.error('Could not add the task. Please try again.')
   }
 })
 

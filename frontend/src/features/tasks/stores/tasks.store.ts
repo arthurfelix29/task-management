@@ -4,6 +4,7 @@ import { useStorage } from '@vueuse/core'
 import { tasksApi } from '@/features/tasks/composables/useTasksApi'
 import type { SortOption, Task, TaskFilter } from '@/features/tasks/types/task'
 import { type ApiError, describeError } from '@/shared/lib/problem-details'
+import { useToast } from '@/composables/useToast'
 
 const VALID_SORTS: readonly SortOption[] = ['newest', 'oldest', 'name-asc', 'name-desc']
 
@@ -12,6 +13,8 @@ const sortSerializer = {
     (VALID_SORTS as readonly string[]).includes(raw) ? (raw as SortOption) : 'newest',
   write: (value: SortOption) => value,
 }
+
+const NETWORK_ERROR_MESSAGE = 'Something went wrong. Check your connection.'
 
 export type ViewState =
   | { kind: 'loading' }
@@ -27,6 +30,8 @@ export class TaskValidationError extends Error {
 }
 
 export const useTasksStore = defineStore('tasks', () => {
+  const toast = useToast()
+
   const tasks = ref<Task[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -49,9 +54,6 @@ export const useTasksStore = defineStore('tasks', () => {
 
     return sortTasks(titleFiltered, sortBy.value)
   })
-
-  const completedCount = computed(() => tasks.value.filter((t) => t.isCompleted).length)
-  const totalCount = computed(() => tasks.value.length)
 
   const viewState = computed<ViewState>(() => {
     if (loading.value && !loaded.value) return { kind: 'loading' }
@@ -80,9 +82,11 @@ export const useTasksStore = defineStore('tasks', () => {
         throw new TaskValidationError(result.error.problem.errors ?? {})
       }
       error.value = describeError(result.error)
+      if (result.error.kind === 'network') toast.error(NETWORK_ERROR_MESSAGE)
       return
     }
     tasks.value = [result.data, ...tasks.value]
+    toast.success('Task created')
   }
 
   async function toggle(id: string) {
@@ -98,6 +102,9 @@ export const useTasksStore = defineStore('tasks', () => {
     if (result.kind === 'error') {
       tasks.value = snapshot
       error.value = describeError(result.error)
+      toast.error(
+        result.error.kind === 'network' ? NETWORK_ERROR_MESSAGE : "Couldn't toggle task. Try again.",
+      )
       return
     }
     tasks.value = tasks.value.map((t) => (t.id === id ? result.data : t))
@@ -113,7 +120,12 @@ export const useTasksStore = defineStore('tasks', () => {
     if (result.kind === 'error' && !isMissingResource(result.error)) {
       tasks.value = snapshot
       error.value = describeError(result.error)
+      toast.error(
+        result.error.kind === 'network' ? NETWORK_ERROR_MESSAGE : "Couldn't delete task. Try again.",
+      )
+      return
     }
+    toast.success('Task deleted')
   }
 
   function setFilter(next: TaskFilter) {
@@ -141,8 +153,6 @@ export const useTasksStore = defineStore('tasks', () => {
     sortBy,
     loaded,
     filteredTasks,
-    completedCount,
-    totalCount,
     viewState,
     loadAll,
     create,

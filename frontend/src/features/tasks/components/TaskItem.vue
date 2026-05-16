@@ -69,10 +69,10 @@ function onCancelDelete() {
       size="icon"
       :disabled="!canDelete"
       :aria-label="`Delete task: ${task.title}`"
-      class="text-danger hover:bg-danger-subtle hover:text-danger focus-visible:outline-danger"
+      class="hover:bg-danger-subtle focus-visible:outline-danger"
       @click="onDeleteClick"
     >
-      <Trash2 class="h-4 w-4" aria-hidden="true" />
+      <Trash2 class="h-4 w-4 text-danger" aria-hidden="true" />
     </Button>
 
     <ConfirmDeleteModal

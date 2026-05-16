@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted } from 'vue'
 import { Moon, Sun } from '@lucide/vue'
 import TaskList from '@/features/tasks/components/TaskList.vue'
 import Toast from '@/shared/ui/Toast.vue'
@@ -6,6 +7,19 @@ import Button from '@/shared/ui/Button.vue'
 import { useTheme } from '@/composables/useTheme'
 
 const { theme, toggle } = useTheme()
+
+function onGlobalKeydown(event: KeyboardEvent) {
+  if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return
+  const target = event.target as HTMLElement | null
+  if (target === null) return
+  const tag = target.tagName
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || target.isContentEditable) return
+  event.preventDefault()
+  document.getElementById('search-input')?.focus()
+}
+
+onMounted(() => window.addEventListener('keydown', onGlobalKeydown))
+onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
 </script>
 
 <template>

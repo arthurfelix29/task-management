@@ -1,8 +1,12 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { tasksApi } from '@/features/tasks/composables/useTasksApi'
+import { matchesTask, parseSearch } from '@/features/tasks/lib/search-parser'
 import type { Task, TaskFilter } from '@/features/tasks/types/task'
 import { type ApiError, describeError } from '@/shared/lib/problem-details'
+
+const USER_LOCALE =
+  typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().locale : 'en-US'
 
 export type ViewState =
   | { kind: 'loading' }
@@ -22,12 +26,21 @@ export const useTasksStore = defineStore('tasks', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
   const filter = ref<TaskFilter>('all')
+  const searchQuery = ref('')
   const loaded = ref(false)
 
   const filteredTasks = computed(() => {
-    if (filter.value === 'all') return tasks.value
-    const targetCompleted = filter.value === 'completed'
-    return tasks.value.filter((t) => t.isCompleted === targetCompleted)
+    const statusFiltered =
+      filter.value === 'all'
+        ? tasks.value
+        : tasks.value.filter((t) => t.isCompleted === (filter.value === 'completed'))
+
+    const query = searchQuery.value.trim()
+    if (query === '') return statusFiltered
+
+    const now = new Date()
+    const tokens = parseSearch(query, USER_LOCALE, now)
+    return statusFiltered.filter((t) => matchesTask(t, tokens, now))
   })
 
   const completedCount = computed(() => tasks.value.filter((t) => t.isCompleted).length)
@@ -100,6 +113,10 @@ export const useTasksStore = defineStore('tasks', () => {
     filter.value = next
   }
 
+  function setSearchQuery(next: string) {
+    searchQuery.value = next
+  }
+
   function clearError() {
     error.value = null
   }
@@ -109,6 +126,7 @@ export const useTasksStore = defineStore('tasks', () => {
     loading,
     error,
     filter,
+    searchQuery,
     loaded,
     filteredTasks,
     completedCount,
@@ -119,6 +137,7 @@ export const useTasksStore = defineStore('tasks', () => {
     toggle,
     remove,
     setFilter,
+    setSearchQuery,
     clearError,
   }
 })

@@ -2,6 +2,7 @@
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTasksStore } from '@/features/tasks/stores/tasks.store'
+import SearchBar from '@/features/tasks/components/SearchBar.vue'
 import CreateTaskForm from '@/features/tasks/components/CreateTaskForm.vue'
 import TaskListItems from '@/features/tasks/components/TaskListItems.vue'
 import TaskFilters from '@/features/tasks/components/TaskFilters.vue'
@@ -20,6 +21,7 @@ onMounted(() => {
 
 <template>
   <section class="space-y-4" :aria-busy="store.loading">
+    <SearchBar />
     <CreateTaskForm />
 
     <div class="flex flex-wrap items-center justify-between gap-2">

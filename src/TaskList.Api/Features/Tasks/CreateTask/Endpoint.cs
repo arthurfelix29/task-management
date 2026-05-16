@@ -20,7 +20,8 @@ public sealed class CreateTaskEndpoint : IEndpointGroup
             .WithTags("Tasks")
             .AllowAnonymous()
             .Produces<TaskResponse>(StatusCodes.Status201Created)
-            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+            .ProducesProblem(StatusCodes.Status409Conflict);
     }
 
     private static async Task<Results<Created<TaskResponse>, ProblemHttpResult>> HandleAsync(

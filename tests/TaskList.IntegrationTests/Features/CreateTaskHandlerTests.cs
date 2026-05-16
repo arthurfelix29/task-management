@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Time.Testing;
 using Shouldly;
 using TaskList.Api.Features.Tasks.CreateTask;
+using TaskList.Domain.Common;
 using TaskList.Domain.Tasks;
 using TaskList.IntegrationTests.Fixtures;
 
@@ -33,5 +34,28 @@ public sealed class CreateTaskHandlerTests
             .FirstOrDefaultAsync(t => t.Id == new TaskId(result.Value.Id), TestContext.Current.CancellationToken);
         persisted.ShouldNotBeNull();
         persisted!.Title.ShouldBe("Buy groceries");
+    }
+
+    [Fact]
+    public async Task When_CreatingTaskWithDuplicateTitle_Should_ReturnConflictFailure()
+    {
+        // Arrange
+        await using var db = new TestDb();
+        var clock = new FakeTimeProvider(Now);
+        var handler = new CreateTaskHandler(db.Context, clock);
+
+        var seed = await handler.HandleAsync(new CreateTaskCommand("Buy milk"), TestContext.Current.CancellationToken);
+        seed.IsSuccess.ShouldBeTrue();
+
+        // Act
+        var duplicate = await handler.HandleAsync(new CreateTaskCommand("  BUY MILK  "), TestContext.Current.CancellationToken);
+
+        // Assert
+        duplicate.IsFailure.ShouldBeTrue();
+        duplicate.Error.Type.ShouldBe(ErrorType.Conflict);
+        duplicate.Error.Code.ShouldBe("task.duplicate_title");
+
+        var count = await db.Context.Tasks.CountAsync(TestContext.Current.CancellationToken);
+        count.ShouldBe(1);
     }
 }

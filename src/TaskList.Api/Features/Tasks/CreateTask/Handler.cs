@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using TaskList.Api.Features.Tasks.Mapping;
 using TaskList.Application.Abstractions;
 using TaskList.Domain.Common;
@@ -13,7 +14,19 @@ public sealed class CreateTaskHandler(AppDbContext db, TimeProvider clock)
     {
         Guard.Against.Null(command);
 
-        var task = TaskItem.Create(command.Title, clock);
+        var normalizedTitle = command.Title.Trim();
+
+        var existingTitles = await db.Tasks
+            .Select(t => t.Title)
+            .ToListAsync(cancellationToken);
+        var duplicateExists = existingTitles
+            .Any(t => string.Equals(t.Trim(), normalizedTitle, StringComparison.OrdinalIgnoreCase));
+        if (duplicateExists)
+        {
+            return TaskErrors.DuplicateTitle(normalizedTitle);
+        }
+
+        var task = TaskItem.Create(normalizedTitle, clock);
 
         db.Tasks.Add(task);
         await db.SaveChangesAsync(cancellationToken);

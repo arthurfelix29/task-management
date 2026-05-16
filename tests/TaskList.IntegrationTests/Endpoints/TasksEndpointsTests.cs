@@ -37,6 +37,26 @@ public sealed class TasksEndpointsTests : IClassFixture<TaskApiFactory>, IAsyncL
     }
 
     [Fact]
+    public async Task When_PostingDuplicateTitle_Should_Return409WithProblemDetails()
+    {
+        var first = await _client.PostAsJsonAsync(
+            "/api/v1/tasks",
+            new { title = "Read RFC 7807" },
+            TestContext.Current.CancellationToken);
+        first.StatusCode.ShouldBe(HttpStatusCode.Created);
+
+        var response = await _client.PostAsJsonAsync(
+            "/api/v1/tasks",
+            new { title = "  read RFC 7807  " },
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(TestContext.Current.CancellationToken);
+        body.GetProperty("status").GetInt32().ShouldBe(409);
+        body.GetProperty("detail").GetString().ShouldNotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
     public async Task When_PostingEmptyTitle_Should_Return422WithProblemDetails()
     {
         var response = await _client.PostAsJsonAsync(

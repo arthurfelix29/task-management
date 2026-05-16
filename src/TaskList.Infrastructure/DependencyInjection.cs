@@ -10,8 +10,6 @@ namespace TaskList.Infrastructure;
 
 public static class DependencyInjection
 {
-    private const int SeedTaskCount = 10;
-
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         Guard.Against.Null(services);
@@ -34,7 +32,7 @@ public static class DependencyInjection
                 }
 
                 var clock = sp.GetRequiredService<TimeProvider>();
-                var seed = TaskSeeder.Generate(clock, SeedTaskCount);
+                var seed = TaskSeeder.Generate(clock);
                 await context.Set<TaskItem>().AddRangeAsync(seed, ct);
                 await context.SaveChangesAsync(ct);
             });
@@ -47,7 +45,7 @@ public static class DependencyInjection
                 }
 
                 var clock = sp.GetRequiredService<TimeProvider>();
-                var seed = TaskSeeder.Generate(clock, SeedTaskCount);
+                var seed = TaskSeeder.Generate(clock);
                 context.Set<TaskItem>().AddRange(seed);
                 context.SaveChanges();
             });

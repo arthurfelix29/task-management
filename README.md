@@ -14,7 +14,7 @@ Stack: .NET 10 Minimal APIs over Clean Architecture + Vertical Slice Architectur
 
 - **Runtime**: .NET 10, C# 14, Node.js 24 LTS
 - **API**: ASP.NET Core Minimal APIs + Scalar OpenAPI viewer
-- **Data**: EF Core 10 with SQLite (in-process file `tasklist.db`), Bogus seeder
+- **Data**: EF Core 10 with SQLite (in-process file `tasklist.db`), fixed seed of 10 realistic tasks
 - **Validation**: FluentValidation at the API boundary, Ardalis.GuardClauses for domain invariants
 - **Cross-cutting**: Serilog structured logs, `IExceptionHandler` global error mapping, health endpoints
 - **Frontend**: Vue 3.5 (`<script setup>`), Pinia, vee-validate + zod, TailwindCSS 4 with semantic tokens, class-variance-authority for Button variants, VueUse, vue-axe in dev
@@ -169,6 +169,8 @@ dotnet dev-certs https --trust
 On Linux the trust step needs additional setup. See <https://aka.ms/dev-certs-trust>.
 
 **SQLite database file locked.** Delete `src/TaskList.Api/tasklist.db` (plus any `-shm` or `-wal` siblings) and restart the API. The migration and seeder recreate it on next boot.
+
+**Seeded tasks differ from the documented examples after pulling.** Delete `src/TaskList.Api/tasklist.db` and restart. The seeder only runs against an empty database, so existing rows from a prior run are left as-is.
 
 **Migrations did not run on startup.** They run inside `Program.cs` via `MigrateAsync`. If you ever need to apply them manually:
 

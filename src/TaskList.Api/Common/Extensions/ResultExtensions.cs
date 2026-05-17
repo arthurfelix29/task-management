@@ -1,3 +1,5 @@
+using System.Globalization;
+using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Http.HttpResults;
 using TaskList.Domain.Common;
 
@@ -26,6 +28,6 @@ public static class ResultExtensions
             detail: result.Error.Description,
             statusCode: statusCode,
             title: result.Error.Code,
-            type: $"https://datatracker.ietf.org/doc/html/rfc9110#name-{statusCode}");
+            type: string.Create(CultureInfo.InvariantCulture, $"https://datatracker.ietf.org/doc/html/rfc9110#name-{statusCode}"));
     }
 }

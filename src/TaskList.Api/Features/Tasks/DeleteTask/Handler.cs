@@ -1,3 +1,4 @@
+using Ardalis.GuardClauses;
 using Microsoft.EntityFrameworkCore;
 using TaskList.Application.Abstractions;
 using TaskList.Domain.Common;
@@ -12,12 +13,8 @@ public sealed class DeleteTaskHandler(AppDbContext db) : ICommandHandler<DeleteT
     {
         Guard.Against.Null(command);
 
-        var deleted = await db.Tasks
-            .Where(t => t.Id == command.Id)
-            .ExecuteDeleteAsync(cancellationToken);
+        var deleted = await db.Tasks.Where(t => t.Id == command.Id).ExecuteDeleteAsync(cancellationToken);
 
-        return deleted == 0
-            ? TaskErrors.NotFound(command.Id)
-            : Result.Success();
+        return deleted == 0 ? TaskErrors.NotFound(command.Id) : Result.Success();
     }
 }

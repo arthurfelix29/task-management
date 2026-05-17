@@ -1,17 +1,13 @@
+using System.Globalization;
+using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TaskList.Api.Common.Middleware;
 
-public sealed class GlobalExceptionHandler(
-    IProblemDetailsService problemDetailsService,
-    IHostEnvironment env,
-    ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
+public sealed class GlobalExceptionHandler(IProblemDetailsService problemDetailsService, IHostEnvironment env, ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
-    public async ValueTask<bool> TryHandleAsync(
-        HttpContext httpContext,
-        Exception exception,
-        CancellationToken cancellationToken)
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
         Guard.Against.Null(httpContext);
         Guard.Against.Null(exception);
@@ -43,7 +39,7 @@ public sealed class GlobalExceptionHandler(
             {
                 Status = statusCode,
                 Title = title,
-                Type = $"https://datatracker.ietf.org/doc/html/rfc9110#name-{statusCode}",
+                Type = string.Create(CultureInfo.InvariantCulture, $"https://datatracker.ietf.org/doc/html/rfc9110#name-{statusCode}"),
                 Detail = detail,
             },
         });

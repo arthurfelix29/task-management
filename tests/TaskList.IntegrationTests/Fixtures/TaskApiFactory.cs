@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TaskList.Infrastructure.Persistence;
@@ -12,8 +11,8 @@ public sealed class TaskApiFactory : WebApplicationFactory<Program>, IAsyncLifet
 {
     private readonly SqliteConnection _connection = new("DataSource=:memory:");
 
-    public async ValueTask InitializeAsync() =>
-        await _connection.OpenAsync(TestContext.Current.CancellationToken);
+    public async ValueTask InitializeAsync()
+        => await _connection.OpenAsync(TestContext.Current.CancellationToken);
 
     public override async ValueTask DisposeAsync()
     {

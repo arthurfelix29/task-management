@@ -35,9 +35,9 @@ dotnet_separate_import_directive_groups = false
 csharp_style_namespace_declarations = file_scoped:error
 
 # var preferences
-csharp_style_var_for_built_in_types = true:suggestion
-csharp_style_var_when_type_is_apparent = true:suggestion
-csharp_style_var_elsewhere = false:suggestion
+csharp_style_var_for_built_in_types = true:silent
+csharp_style_var_when_type_is_apparent = true:silent
+csharp_style_var_elsewhere = true:silent
 
 # Expression-bodied members
 csharp_style_expression_bodied_methods = when_on_single_line:suggestion
@@ -177,7 +177,12 @@ dotnet_diagnostic.CA1848.severity = none
 # Test projects — relax conventions that conflict with xUnit norms
 # ─────────────────────────────────────────────────────────────
 [tests/**/*.cs]
-dotnet_diagnostic.CA1707.severity = none     # Underscores in identifiers — required by Method_Scenario_Expected test names
+dotnet_diagnostic.CA1707.severity = none     # Underscores in identifiers — required by When_Trigger_Should_Expectation test names
+
+# Test methods are named by behaviour (When_..._Should_...), not by the
+# async-suffix convention used for production code. Disable the suffix
+# rule in the test tree so it does not flag xUnit methods.
+dotnet_naming_rule.async_methods_should_end_with_async.severity = none
 
 # ─────────────────────────────────────────────────────────────
 # Vertical slice feature folders use generic file names

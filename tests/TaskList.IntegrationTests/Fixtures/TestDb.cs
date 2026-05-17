@@ -1,5 +1,4 @@
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using TaskList.Infrastructure.Persistence;
 
 namespace TaskList.IntegrationTests.Fixtures;
@@ -13,9 +12,7 @@ public sealed class TestDb : IAsyncDisposable
         _connection = new SqliteConnection("DataSource=:memory:");
         _connection.Open();
 
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite(_connection)
-            .Options;
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseSqlite(_connection).Options;
 
         Context = new AppDbContext(options);
         Context.Database.EnsureCreated();

@@ -1,6 +1,4 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TaskList.Domain.Tasks;
 
 namespace TaskList.Infrastructure.Persistence.Configurations;
 

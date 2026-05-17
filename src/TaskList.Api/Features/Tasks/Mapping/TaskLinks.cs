@@ -1,3 +1,4 @@
+using Ardalis.GuardClauses;
 using TaskList.Api.Common;
 
 namespace TaskList.Api.Features.Tasks.Mapping;
@@ -11,12 +12,9 @@ internal static class TaskLinks
 
         return
         [
-            new LinkResponse(
-                Build(links, httpContext, RouteNames.Tasks.GetById, new { id }), "self", HttpMethods.Get),
-            new LinkResponse(
-                Build(links, httpContext, RouteNames.Tasks.Toggle, new { id }), "toggle", HttpMethods.Post),
-            new LinkResponse(
-                Build(links, httpContext, RouteNames.Tasks.Delete, new { id }), "delete", HttpMethods.Delete),
+            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.GetById, new { id }), "self", HttpMethods.Get),
+            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.Toggle, new { id }), "toggle", HttpMethods.Post),
+            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.Delete, new { id }), "delete", HttpMethods.Delete),
         ];
     }
 
@@ -27,8 +25,8 @@ internal static class TaskLinks
 
         return
         [
-            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.List, null), "self", HttpMethods.Get),
-            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.Create, null), "create", HttpMethods.Post),
+            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.List, values: null), "self", HttpMethods.Get),
+            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.Create, values: null), "create", HttpMethods.Post),
         ];
     }
 

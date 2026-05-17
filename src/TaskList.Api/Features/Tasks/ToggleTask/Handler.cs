@@ -1,3 +1,4 @@
+using Ardalis.GuardClauses;
 using Microsoft.EntityFrameworkCore;
 using TaskList.Api.Features.Tasks.Mapping;
 using TaskList.Application.Abstractions;
@@ -7,16 +8,13 @@ using TaskList.Infrastructure.Persistence;
 
 namespace TaskList.Api.Features.Tasks.ToggleTask;
 
-public sealed class ToggleTaskHandler(AppDbContext db)
-    : ICommandHandler<ToggleTaskCommand, Result<TaskResponse>>
+public sealed class ToggleTaskHandler(AppDbContext db) : ICommandHandler<ToggleTaskCommand, Result<TaskResponse>>
 {
     public async Task<Result<TaskResponse>> HandleAsync(ToggleTaskCommand command, CancellationToken cancellationToken)
     {
         Guard.Against.Null(command);
 
-        var task = await db.Tasks
-            .AsTracking()
-            .FirstOrDefaultAsync(t => t.Id == command.Id, cancellationToken);
+        var task = await db.Tasks.AsTracking().FirstOrDefaultAsync(t => t.Id == command.Id, cancellationToken);
 
         if (task is null)
             return TaskErrors.NotFound(command.Id);

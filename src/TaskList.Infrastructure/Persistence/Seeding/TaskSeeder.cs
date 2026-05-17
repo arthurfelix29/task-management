@@ -1,10 +1,8 @@
-using TaskList.Domain.Tasks;
-
 namespace TaskList.Infrastructure.Persistence.Seeding;
 
 internal static class TaskSeeder
 {
-    private static readonly string[] SeedTitles =
+    private static readonly string[] _seedTitles =
     [
         "Review pull requests from Q2 sprint backlog",
         "Pick up Maria from school at 4 PM",
@@ -18,17 +16,17 @@ internal static class TaskSeeder
         "Read chapter 4 of Designing Data-Intensive Applications",
     ];
 
-    private static readonly HashSet<int> PreCompletedIndexes = [1, 4, 7];
+    private static readonly HashSet<int> _preCompletedIndexes = [1, 4, 7];
 
     public static IReadOnlyList<TaskItem> Generate(TimeProvider clock)
     {
         Guard.Against.Null(clock);
 
-        var tasks = new List<TaskItem>(SeedTitles.Length);
-        for (var i = 0; i < SeedTitles.Length; i++)
+        var tasks = new List<TaskItem>(_seedTitles.Length);
+        for (var i = 0; i < _seedTitles.Length; i++)
         {
-            var task = TaskItem.Create(SeedTitles[i], clock);
-            if (PreCompletedIndexes.Contains(i))
+            var task = TaskItem.Create(_seedTitles[i], clock);
+            if (_preCompletedIndexes.Contains(i))
                 task.Toggle();
 
             tasks.Add(task);

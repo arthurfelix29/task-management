@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace TaskList.Infrastructure.Persistence;
@@ -7,10 +6,7 @@ internal sealed class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<A
 {
     public AppDbContext CreateDbContext(string[] args)
     {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite("Data Source=tasklist.db")
-            .Options;
-
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseSqlite("Data Source=tasklist.db").Options;
         return new AppDbContext(options);
     }
 }

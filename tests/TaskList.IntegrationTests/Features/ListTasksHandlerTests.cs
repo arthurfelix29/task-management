@@ -1,8 +1,5 @@
 using Microsoft.Extensions.Time.Testing;
-using Shouldly;
 using TaskList.Api.Features.Tasks.ListTasks;
-using TaskList.Domain.Tasks;
-using TaskList.IntegrationTests.Fixtures;
 
 namespace TaskList.IntegrationTests.Features;
 

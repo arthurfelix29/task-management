@@ -1,8 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using TaskList.Domain.Tasks;
 using TaskList.Infrastructure.Persistence;
 using TaskList.Infrastructure.Persistence.Seeding;
 
@@ -17,8 +15,7 @@ public static class DependencyInjection
 
         services.TryAddSingleton(TimeProvider.System);
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? "Data Source=tasklist.db";
+        var connectionString = configuration.GetConnectionString("DefaultConnection") ?? "Data Source=tasklist.db";
 
         services.AddDbContext<AppDbContext>((sp, options) =>
         {
@@ -31,6 +28,7 @@ public static class DependencyInjection
 
                 var clock = sp.GetRequiredService<TimeProvider>();
                 var seed = TaskSeeder.Generate(clock);
+
                 await context.Set<TaskItem>().AddRangeAsync(seed, ct);
                 await context.SaveChangesAsync(ct);
             });
@@ -42,6 +40,7 @@ public static class DependencyInjection
 
                 var clock = sp.GetRequiredService<TimeProvider>();
                 var seed = TaskSeeder.Generate(clock);
+
                 context.Set<TaskItem>().AddRange(seed);
                 context.SaveChanges();
             });

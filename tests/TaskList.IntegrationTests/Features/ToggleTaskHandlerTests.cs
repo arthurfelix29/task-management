@@ -1,23 +1,19 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Time.Testing;
-using Shouldly;
 using TaskList.Api.Features.Tasks.ToggleTask;
 using TaskList.Domain.Common;
-using TaskList.Domain.Tasks;
-using TaskList.IntegrationTests.Fixtures;
 
 namespace TaskList.IntegrationTests.Features;
 
 public sealed class ToggleTaskHandlerTests
 {
-    private static readonly DateTimeOffset Now = new(2026, 5, 15, 10, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset _now = new(2026, 5, 15, 10, 0, 0, TimeSpan.Zero);
 
     [Fact]
     public async Task When_TogglingExistingTask_Should_FlipCompletionAndPersist()
     {
         // Arrange
         await using var db = new TestDb();
-        var task = TaskFaker.ATask(new FakeTimeProvider(Now));
+        var task = TaskFaker.ATask(new FakeTimeProvider(_now));
         db.Context.Tasks.Add(task);
         await db.Context.SaveChangesAsync(TestContext.Current.CancellationToken);
         db.Context.ChangeTracker.Clear();

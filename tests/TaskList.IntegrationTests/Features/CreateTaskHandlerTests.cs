@@ -1,23 +1,19 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Time.Testing;
-using Shouldly;
 using TaskList.Api.Features.Tasks.CreateTask;
 using TaskList.Domain.Common;
-using TaskList.Domain.Tasks;
-using TaskList.IntegrationTests.Fixtures;
 
 namespace TaskList.IntegrationTests.Features;
 
 public sealed class CreateTaskHandlerTests
 {
-    private static readonly DateTimeOffset Now = new(2026, 5, 15, 10, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset _now = new(2026, 5, 15, 10, 0, 0, TimeSpan.Zero);
 
     [Fact]
     public async Task When_CreatingTaskWithValidTitle_Should_PersistAndReturnSuccess()
     {
         // Arrange
         await using var db = new TestDb();
-        var clock = new FakeTimeProvider(Now);
+        var clock = new FakeTimeProvider(_now);
         var handler = new CreateTaskHandler(db.Context, clock);
         var command = new CreateTaskCommand("Buy groceries");
 
@@ -28,7 +24,7 @@ public sealed class CreateTaskHandlerTests
         result.IsSuccess.ShouldBeTrue();
         result.Value.Title.ShouldBe("Buy groceries");
         result.Value.IsCompleted.ShouldBeFalse();
-        result.Value.CreatedAt.ShouldBe(Now);
+        result.Value.CreatedAt.ShouldBe(_now);
 
         var persisted = await db.Context.Tasks
             .FirstOrDefaultAsync(t => t.Id == new TaskId(result.Value.Id), TestContext.Current.CancellationToken);
@@ -41,7 +37,7 @@ public sealed class CreateTaskHandlerTests
     {
         // Arrange
         await using var db = new TestDb();
-        var clock = new FakeTimeProvider(Now);
+        var clock = new FakeTimeProvider(_now);
         var handler = new CreateTaskHandler(db.Context, clock);
 
         var seed = await handler.HandleAsync(new CreateTaskCommand("Buy milk"), TestContext.Current.CancellationToken);

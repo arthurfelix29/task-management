@@ -6,9 +6,7 @@ namespace TaskList.Domain.Tasks;
 public sealed class TaskItem : Entity<TaskId>
 {
     public string Title { get; private init; } = string.Empty;
-
     public bool IsCompleted { get; private set; }
-
     public DateTimeOffset CreatedAt { get; private init; }
 
     private TaskItem() { }

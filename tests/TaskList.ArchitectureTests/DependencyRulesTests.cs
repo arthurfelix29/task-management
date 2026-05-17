@@ -8,69 +8,77 @@ namespace TaskList.ArchitectureTests;
 
 public sealed class DependencyRulesTests
 {
-    private static readonly Assembly DomainAssembly = typeof(TaskItem).Assembly;
-    private static readonly Assembly ApplicationAssembly = typeof(ICommandHandler<,>).Assembly;
+    private static readonly Assembly _domainAssembly = typeof(TaskItem).Assembly;
+    private static readonly Assembly _applicationAssembly = typeof(ICommandHandler<,>).Assembly;
 
     [Fact]
     public void Domain_ShouldNot_DependOn_Application()
     {
-        var result = Types.InAssembly(DomainAssembly)
+        // Act
+        var result = Types.InAssembly(_domainAssembly)
             .ShouldNot()
             .HaveDependencyOn("TaskList.Application")
             .GetResult();
 
+        // Assert
         AssertSuccess(result);
     }
 
     [Fact]
     public void Domain_ShouldNot_DependOn_Infrastructure()
     {
-        var result = Types.InAssembly(DomainAssembly)
+        // Act
+        var result = Types.InAssembly(_domainAssembly)
             .ShouldNot()
             .HaveDependencyOn("TaskList.Infrastructure")
             .GetResult();
 
+        // Assert
         AssertSuccess(result);
     }
 
     [Fact]
     public void Domain_ShouldNot_DependOn_Api()
     {
-        var result = Types.InAssembly(DomainAssembly)
+        // Act
+        var result = Types.InAssembly(_domainAssembly)
             .ShouldNot()
             .HaveDependencyOn("TaskList.Api")
             .GetResult();
 
+        // Assert
         AssertSuccess(result);
     }
 
     [Fact]
     public void Application_ShouldNot_DependOn_Infrastructure()
     {
-        var result = Types.InAssembly(ApplicationAssembly)
+        // Act
+        var result = Types.InAssembly(_applicationAssembly)
             .ShouldNot()
             .HaveDependencyOn("TaskList.Infrastructure")
             .GetResult();
 
+        // Assert
         AssertSuccess(result);
     }
 
     [Fact]
     public void Application_ShouldNot_DependOn_Api()
     {
-        var result = Types.InAssembly(ApplicationAssembly)
+        // Act
+        var result = Types.InAssembly(_applicationAssembly)
             .ShouldNot()
             .HaveDependencyOn("TaskList.Api")
             .GetResult();
 
+        // Assert
         AssertSuccess(result);
     }
 
     private static void AssertSuccess(NetArchTest.Rules.TestResult result)
     {
-        var failing = result.FailingTypeNames is null
-            ? string.Empty
-            : string.Join(", ", result.FailingTypeNames);
+        var failing = result.FailingTypeNames is null ? string.Empty : string.Join(", ", result.FailingTypeNames);
         result.IsSuccessful.ShouldBeTrue(failing);
     }
 }

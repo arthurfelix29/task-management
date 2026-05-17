@@ -1,3 +1,4 @@
+using Ardalis.GuardClauses;
 using Microsoft.EntityFrameworkCore;
 using TaskList.Api.Features.Tasks.Mapping;
 using TaskList.Application.Abstractions;
@@ -7,8 +8,7 @@ using TaskList.Infrastructure.Persistence;
 
 namespace TaskList.Api.Features.Tasks.CreateTask;
 
-public sealed class CreateTaskHandler(AppDbContext db, TimeProvider clock)
-    : ICommandHandler<CreateTaskCommand, Result<TaskResponse>>
+public sealed class CreateTaskHandler(AppDbContext db, TimeProvider clock) : ICommandHandler<CreateTaskCommand, Result<TaskResponse>>
 {
     public async Task<Result<TaskResponse>> HandleAsync(CreateTaskCommand command, CancellationToken cancellationToken)
     {
@@ -16,11 +16,9 @@ public sealed class CreateTaskHandler(AppDbContext db, TimeProvider clock)
 
         var normalizedTitle = command.Title.Trim();
 
-        var existingTitles = await db.Tasks
-            .Select(t => t.Title)
-            .ToListAsync(cancellationToken);
-        var duplicateExists = existingTitles
-            .Any(t => string.Equals(t.Trim(), normalizedTitle, StringComparison.OrdinalIgnoreCase));
+        var existingTitles = await db.Tasks.Select(t => t.Title).ToListAsync(cancellationToken);
+        var duplicateExists = existingTitles.Exists(t => string.Equals(t.Trim(), normalizedTitle, StringComparison.OrdinalIgnoreCase));
+
         if (duplicateExists)
             return TaskErrors.DuplicateTitle(normalizedTitle);
 

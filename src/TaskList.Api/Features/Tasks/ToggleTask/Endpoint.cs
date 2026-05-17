@@ -32,9 +32,7 @@ public sealed class ToggleTaskEndpoint : IEndpointGroup
     {
         var result = await handler.HandleAsync(new ToggleTaskCommand(new TaskId(id)), cancellationToken);
         if (result.IsFailure)
-        {
             return result.ToProblemDetails();
-        }
 
         var task = result.Value with { Links = TaskLinks.ForItem(links, httpContext, result.Value.Id) };
         return TypedResults.Ok(task);

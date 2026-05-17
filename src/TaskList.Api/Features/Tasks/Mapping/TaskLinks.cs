@@ -11,9 +11,12 @@ internal static class TaskLinks
 
         return
         [
-            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.GetById, new { id }), "self", HttpMethods.Get),
-            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.Toggle, new { id }), "toggle", HttpMethods.Post),
-            new LinkResponse(Build(links, httpContext, RouteNames.Tasks.Delete, new { id }), "delete", HttpMethods.Delete),
+            new LinkResponse(
+                Build(links, httpContext, RouteNames.Tasks.GetById, new { id }), "self", HttpMethods.Get),
+            new LinkResponse(
+                Build(links, httpContext, RouteNames.Tasks.Toggle, new { id }), "toggle", HttpMethods.Post),
+            new LinkResponse(
+                Build(links, httpContext, RouteNames.Tasks.Delete, new { id }), "delete", HttpMethods.Delete),
         ];
     }
 

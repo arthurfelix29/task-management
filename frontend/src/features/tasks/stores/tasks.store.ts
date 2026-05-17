@@ -16,10 +16,12 @@ const sortSerializer = {
 
 const NETWORK_ERROR_MESSAGE = 'Something went wrong. Check your connection.'
 
+export type EmptyReason = 'search' | 'filter'
+
 export type ViewState =
   | { kind: 'loading' }
   | { kind: 'error'; message: string; canRetry: boolean }
-  | { kind: 'empty'; filter: TaskFilter }
+  | { kind: 'empty'; reason: EmptyReason; filter: TaskFilter }
   | { kind: 'success'; tasks: Task[] }
 
 export type CreateTaskOutcome =
@@ -42,6 +44,23 @@ export const useTasksStore = defineStore('tasks', () => {
     serializer: sortSerializer,
   })
   const loaded = ref(false)
+  const pendingIds = ref<Set<string>>(new Set())
+
+  function isPending(id: string): boolean {
+    return pendingIds.value.has(id)
+  }
+
+  function markPending(id: string) {
+    if (pendingIds.value.has(id)) return
+    pendingIds.value = new Set([...pendingIds.value, id])
+  }
+
+  function clearPending(id: string) {
+    if (!pendingIds.value.has(id)) return
+    const next = new Set(pendingIds.value)
+    next.delete(id)
+    pendingIds.value = next
+  }
 
   const filteredTasks = computed(() => {
     const statusFiltered =
@@ -59,7 +78,10 @@ export const useTasksStore = defineStore('tasks', () => {
   const viewState = computed<ViewState>(() => {
     if (loading.value && !loaded.value) return { kind: 'loading' }
     if (error.value !== null) return { kind: 'error', message: error.value, canRetry: true }
-    if (filteredTasks.value.length === 0) return { kind: 'empty', filter: filter.value }
+    if (filteredTasks.value.length === 0) {
+      const reason: EmptyReason = searchQuery.value.trim() === '' ? 'filter' : 'search'
+      return { kind: 'empty', reason, filter: filter.value }
+    }
     return { kind: 'success', tasks: filteredTasks.value }
   })
 
@@ -102,36 +124,47 @@ export const useTasksStore = defineStore('tasks', () => {
     const original = snapshot[index]
     if (original === undefined) return
 
+    markPending(id)
     tasks.value = snapshot.map((t, i) => (i === index ? { ...t, isCompleted: !t.isCompleted } : t))
 
-    const result = await tasksApi.toggle(id)
-    if (result.kind === 'error') {
-      tasks.value = snapshot
-      error.value = describeError(result.error)
-      toast.error(
-        result.error.kind === 'network' ? NETWORK_ERROR_MESSAGE : "Couldn't toggle task. Try again.",
-      )
-      return
+    try {
+      const result = await tasksApi.toggle(id)
+      if (result.kind === 'error') {
+        tasks.value = snapshot
+        error.value = describeError(result.error)
+        toast.error(
+          result.error.kind === 'network' ? NETWORK_ERROR_MESSAGE : "Couldn't toggle task. Try again.",
+        )
+        return
+      }
+      tasks.value = tasks.value.map((t) => (t.id === id ? result.data : t))
+    } finally {
+      clearPending(id)
     }
-    tasks.value = tasks.value.map((t) => (t.id === id ? result.data : t))
   }
 
   async function remove(id: string) {
     const snapshot = tasks.value
     if (!snapshot.some((t) => t.id === id)) return
 
+    markPending(id)
     tasks.value = snapshot.filter((t) => t.id !== id)
 
-    const result = await tasksApi.remove(id)
-    if (result.kind === 'error' && !isMissingResource(result.error)) {
-      tasks.value = snapshot
-      error.value = describeError(result.error)
-      toast.error(
-        result.error.kind === 'network' ? NETWORK_ERROR_MESSAGE : "Couldn't delete task. Try again.",
-      )
-      return
+    try {
+      const result = await tasksApi.remove(id)
+      if (result.kind === 'error') {
+        if (isMissingResource(result.error)) return
+        tasks.value = snapshot
+        error.value = describeError(result.error)
+        toast.error(
+          result.error.kind === 'network' ? NETWORK_ERROR_MESSAGE : "Couldn't delete task. Try again.",
+        )
+        return
+      }
+      toast.success('Task deleted')
+    } finally {
+      clearPending(id)
     }
-    toast.success('Task deleted')
   }
 
   function setFilter(next: TaskFilter) {
@@ -158,12 +191,14 @@ export const useTasksStore = defineStore('tasks', () => {
     searchQuery,
     sortBy,
     loaded,
+    pendingIds,
     filteredTasks,
     viewState,
     loadAll,
     create,
     toggle,
     remove,
+    isPending,
     setFilter,
     setSearchQuery,
     setSortBy,

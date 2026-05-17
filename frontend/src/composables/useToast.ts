@@ -109,7 +109,8 @@ function resume(id: number) {
   const t = now()
   toasts.value = toasts.value.map((toast) => {
     if (toast.id !== id || toast.pausedAt === null) return toast
-    return { ...toast, pausedAt: null, totalPaused: toast.totalPaused + (t - toast.pausedAt) }
+    const pausedDuration = t - toast.pausedAt
+    return { ...toast, pausedAt: null, totalPaused: toast.totalPaused + pausedDuration }
   })
   startLoopIfNeeded()
 }

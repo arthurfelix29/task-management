@@ -45,9 +45,7 @@ public sealed class CreateTaskEndpoint : IEndpointGroup
 
         var result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
-        {
             return result.ToProblemDetails();
-        }
 
         var task = result.Value with { Links = TaskLinks.ForItem(links, httpContext, result.Value.Id) };
         var location = links.GetUriByName(httpContext, RouteNames.Tasks.GetById, new { id = task.Id });

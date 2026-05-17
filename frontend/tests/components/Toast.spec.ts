@@ -71,4 +71,27 @@ describe('Toast', () => {
 
     expect(screen.queryByText('Dismiss me')).not.toBeInTheDocument()
   })
+
+  it('When_ToastDismissedThenNewOneCreated_Should_KeepProgressAnimating', async () => {
+    vi.useFakeTimers({
+      toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame', 'performance'],
+    })
+    render(Toast)
+    const api = useToast()
+
+    const firstId = api.success('first', 1000)
+    await vi.advanceTimersByTimeAsync(50)
+    api.dismiss(firstId)
+
+    const secondId = api.success('second', 1000)
+    await vi.advanceTimersByTimeAsync(100)
+    const earlyRatio = api.progress.value[secondId]
+    expect(earlyRatio).toBeDefined()
+    expect(earlyRatio).toBeLessThan(1)
+
+    await vi.advanceTimersByTimeAsync(300)
+    const laterRatio = api.progress.value[secondId]
+    expect(laterRatio).toBeDefined()
+    expect(laterRatio!).toBeLessThan(earlyRatio!)
+  })
 })

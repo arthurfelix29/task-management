@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/vue'
+import { screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import TaskItem from '@/features/tasks/components/TaskItem.vue'
 import type { Task } from '@/features/tasks/types/task'
+import { renderWithProviders } from '../setup/render'
 
 const baseTask: Task = {
   id: 'task-1',
@@ -19,7 +20,7 @@ const baseTask: Task = {
 describe('TaskItem', () => {
   it('When_ClickingToggleCheckbox_Should_EmitToggleWithTaskId', async () => {
     const user = userEvent.setup()
-    const { emitted } = render(TaskItem, { props: { task: baseTask } })
+    const { emitted } = renderWithProviders(TaskItem, { props: { task: baseTask } })
 
     await user.click(screen.getByRole('checkbox'))
 
@@ -28,7 +29,7 @@ describe('TaskItem', () => {
 
   it('When_ConfirmingDeleteInModal_Should_EmitRemoveWithTaskId', async () => {
     const user = userEvent.setup()
-    const { emitted } = render(TaskItem, { props: { task: baseTask } })
+    const { emitted } = renderWithProviders(TaskItem, { props: { task: baseTask } })
 
     await user.click(screen.getByRole('button', { name: /delete task: buy groceries/i }))
     await user.click(await screen.findByRole('button', { name: /^delete$/i }))
@@ -38,7 +39,7 @@ describe('TaskItem', () => {
 
   it('When_TaskHasNoToggleLink_Should_DisableToggleCheckbox', () => {
     const taskWithoutToggle: Task = { ...baseTask, links: baseTask.links.filter((l) => l.rel !== 'toggle') }
-    render(TaskItem, { props: { task: taskWithoutToggle } })
+    renderWithProviders(TaskItem, { props: { task: taskWithoutToggle } })
 
     expect(screen.getByRole('checkbox')).toBeDisabled()
   })

@@ -19,9 +19,7 @@ public sealed class ToggleTaskHandler(AppDbContext db)
             .FirstOrDefaultAsync(t => t.Id == command.Id, cancellationToken);
 
         if (task is null)
-        {
             return TaskErrors.NotFound(command.Id);
-        }
 
         task.Toggle();
         await db.SaveChangesAsync(cancellationToken);

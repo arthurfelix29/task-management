@@ -15,8 +15,8 @@ const { theme, toggle } = useTheme()
   <main id="main" class="mx-auto max-w-2xl px-4 py-10">
     <header class="mb-8 flex items-start justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-semibold tracking-tight text-foreground">Tasks</h1>
-        <p class="mt-1 text-sm text-muted-foreground">A small task list. Add, toggle, delete.</p>
+        <h1 class="text-3xl font-semibold tracking-tight text-foreground">Tasklist</h1>
+        <p class="mt-1 text-sm text-muted-foreground">A small task list, done well.</p>
       </div>
       <Button
         variant="secondary"
@@ -30,5 +30,8 @@ const { theme, toggle } = useTheme()
     </header>
     <TaskList />
   </main>
+  <footer class="mx-auto max-w-2xl px-4 pb-8 pt-12 text-center text-xs text-muted-foreground">
+    Built with Vue 3 + .NET 10
+  </footer>
   <Toast />
 </template>

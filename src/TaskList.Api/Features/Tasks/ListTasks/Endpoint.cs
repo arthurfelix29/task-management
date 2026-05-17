@@ -29,9 +29,7 @@ public sealed class ListTasksEndpoint : IEndpointGroup
     {
         var result = await handler.HandleAsync(new ListTasksQuery(), cancellationToken);
         if (result.IsFailure)
-        {
             return result.ToProblemDetails();
-        }
 
         var tasksWithLinks = result.Value
             .Select(t => t with { Links = TaskLinks.ForItem(links, httpContext, t.Id) })

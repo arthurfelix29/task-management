@@ -56,9 +56,7 @@ public sealed class NamingConventionsTests
         while (current is not null)
         {
             if (current.IsGenericType && current.GetGenericTypeDefinition() == typeof(AbstractValidator<>))
-            {
                 return true;
-            }
             current = current.BaseType;
         }
         return false;

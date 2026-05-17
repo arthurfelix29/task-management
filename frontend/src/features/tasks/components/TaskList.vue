@@ -38,7 +38,7 @@ onMounted(() => {
         :can-retry="viewState.canRetry"
         @retry="store.loadAll()"
       />
-      <EmptyState v-else-if="viewState.kind === 'empty'" :filter="viewState.filter" />
+      <EmptyState v-else-if="viewState.kind === 'empty'" :filter="viewState.filter" :reason="viewState.reason" />
       <TaskListItems
         v-else
         :tasks="viewState.tasks"

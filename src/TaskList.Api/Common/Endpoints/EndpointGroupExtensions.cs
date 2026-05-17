@@ -11,9 +11,7 @@ public static class EndpointGroupExtensions
             .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IEndpointGroup).IsAssignableFrom(t));
 
         foreach (var group in groups)
-        {
             services.AddSingleton(typeof(IEndpointGroup), group);
-        }
 
         return services;
     }
@@ -23,9 +21,7 @@ public static class EndpointGroupExtensions
         Guard.Against.Null(app);
 
         foreach (var group in app.ServiceProvider.GetServices<IEndpointGroup>())
-        {
             group.Map(app);
-        }
 
         return app;
     }

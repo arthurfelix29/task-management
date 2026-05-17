@@ -10,7 +10,7 @@ indent_style = space
 indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
-max_line_length = 120
+max_line_length = 150  # 150 over the older 120 default — wide displays; keeps fluent method calls and test invocations on one line by project convention
 
 [*.{json,yml,yaml,xml,csproj,props,targets,config,slnx}]
 indent_size = 2
@@ -54,7 +54,10 @@ csharp_style_throw_expression = true:suggestion
 csharp_style_conditional_delegate_call = true:suggestion
 
 # Code style
-csharp_prefer_braces = when_multiline:warning
+# Project convention: omit braces for single-statement bodies. The terse form
+# reads as a guard clause and matches the surrounding codebase. Multi-line
+# bodies still require braces — analyzer enforcement still helpful for those.
+csharp_prefer_braces = false:suggestion
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 csharp_using_directive_placement = outside_namespace:error
 csharp_prefer_simple_using_statement = true:suggestion
@@ -142,7 +145,7 @@ dotnet_diagnostic.CS8625.severity = error  # Cannot convert null literal to non-
 # IDE rules promoted to errors
 # ─────────────────────────────────────────────────────────────
 dotnet_diagnostic.IDE0005.severity = warning  # Remove unnecessary usings (warning not error — runs unreliably at build without GenerateDocumentationFile)
-dotnet_diagnostic.IDE0011.severity = warning  # Add braces — warns only on multi-line blocks per csharp_prefer_braces = when_multiline
+dotnet_diagnostic.IDE0011.severity = suggestion  # Add braces — project convention omits braces for single-statement bodies (see csharp_prefer_braces = false above)
 
 # ─────────────────────────────────────────────────────────────
 # Analyzer severity tuning

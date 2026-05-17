@@ -29,6 +29,7 @@ type StoreState = {
 function renderTaskListWith(state: StoreState) {
   return renderWithProviders(TaskList, {
     testingPinia: { stubActions: true, initialState: { tasks: state } },
+    global: { stubs: { 'transition-group': false } },
   })
 }
 

@@ -18,9 +18,7 @@ public sealed class GetTaskByIdHandler(AppDbContext db)
             .FirstOrDefaultAsync(t => t.Id == query.Id, cancellationToken);
 
         if (task is null)
-        {
             return TaskErrors.NotFound(query.Id);
-        }
 
         return TaskResponse.From(task);
     }

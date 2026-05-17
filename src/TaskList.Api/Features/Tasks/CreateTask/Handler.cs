@@ -22,9 +22,7 @@ public sealed class CreateTaskHandler(AppDbContext db, TimeProvider clock)
         var duplicateExists = existingTitles
             .Any(t => string.Equals(t.Trim(), normalizedTitle, StringComparison.OrdinalIgnoreCase));
         if (duplicateExists)
-        {
             return TaskErrors.DuplicateTitle(normalizedTitle);
-        }
 
         var task = TaskItem.Create(normalizedTitle, clock);
 

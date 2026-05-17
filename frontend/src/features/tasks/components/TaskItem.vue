@@ -5,6 +5,7 @@ import Button from '@/shared/ui/Button.vue'
 import Checkbox from '@/shared/ui/Checkbox.vue'
 import ConfirmDeleteModal from '@/features/tasks/components/ConfirmDeleteModal.vue'
 import type { Task } from '@/features/tasks/types/task'
+import { useTasksStore } from '@/features/tasks/stores/tasks.store'
 import { cn } from '@/shared/lib/cn'
 
 interface Props {
@@ -18,8 +19,18 @@ const emit = defineEmits<{
   remove: [id: string]
 }>()
 
-const canToggle = computed(() => props.task.links.some((l) => l.rel === 'toggle'))
-const canDelete = computed(() => props.task.links.some((l) => l.rel === 'delete'))
+const store = useTasksStore()
+
+const isPending = computed(() => store.isPending(props.task.id))
+const canToggle = computed(() => props.task.links.some((l) => l.rel === 'toggle') && !isPending.value)
+const canDelete = computed(() => props.task.links.some((l) => l.rel === 'delete') && !isPending.value)
+
+const rowClasses = computed(() =>
+  cn(
+    'flex items-center gap-3 rounded-md border border-border bg-surface px-3 py-2 shadow-sm transition',
+    isPending.value && 'cursor-wait opacity-60',
+  ),
+)
 
 const titleClasses = computed(() =>
   cn(
@@ -53,7 +64,7 @@ function onCancelDelete() {
 </script>
 
 <template>
-  <li class="flex items-center gap-3 rounded-md border border-border bg-surface px-3 py-2 shadow-sm">
+  <li :class="rowClasses" :aria-busy="isPending || undefined">
     <Checkbox
       :model-value="task.isCompleted"
       :label="`Mark ${task.title} as ${task.isCompleted ? 'pending' : 'completed'}`"

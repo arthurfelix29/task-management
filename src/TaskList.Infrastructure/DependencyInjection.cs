@@ -27,9 +27,7 @@ public static class DependencyInjection
             options.UseAsyncSeeding(async (context, _, ct) =>
             {
                 if (await context.Set<TaskItem>().AnyAsync(ct))
-                {
                     return;
-                }
 
                 var clock = sp.GetRequiredService<TimeProvider>();
                 var seed = TaskSeeder.Generate(clock);
@@ -40,9 +38,7 @@ public static class DependencyInjection
             options.UseSeeding((context, _) =>
             {
                 if (context.Set<TaskItem>().Any())
-                {
                     return;
-                }
 
                 var clock = sp.GetRequiredService<TimeProvider>();
                 var seed = TaskSeeder.Generate(clock);

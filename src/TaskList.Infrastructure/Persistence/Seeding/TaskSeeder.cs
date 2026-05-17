@@ -29,9 +29,7 @@ internal static class TaskSeeder
         {
             var task = TaskItem.Create(SeedTitles[i], clock);
             if (PreCompletedIndexes.Contains(i))
-            {
                 task.Toggle();
-            }
 
             tasks.Add(task);
         }

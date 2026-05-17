@@ -10,9 +10,7 @@ public static class ResultExtensions
         Guard.Against.Null(result);
 
         if (result.IsSuccess)
-        {
             throw new InvalidOperationException("Cannot convert a successful result to ProblemDetails.");
-        }
 
         var statusCode = result.Error.Type switch
         {

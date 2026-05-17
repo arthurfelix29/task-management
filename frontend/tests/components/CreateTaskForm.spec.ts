@@ -58,6 +58,19 @@ describe('CreateTaskForm', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(/200 characters/i)
   })
 
+  it('When_TitleApproachesLimit_Should_ShowCountAndWarningState', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(CreateTaskForm)
+    const input = screen.getByLabelText(/new task/i) as HTMLInputElement
+    input.removeAttribute('maxlength')
+
+    await user.type(input, 'x'.repeat(181))
+
+    const counter = screen.getByText('181/200')
+    expect(counter).toBeInTheDocument()
+    expect(counter).toHaveClass('text-warning')
+  })
+
   it('When_ApiReturns422_Should_DisplayServerErrorOnField', async () => {
     server.use(
       http.post('/api/v1/tasks', () =>

@@ -30,8 +30,5 @@ const { theme, toggle } = useTheme()
     </header>
     <TaskList />
   </main>
-  <footer class="mx-auto max-w-2xl px-4 pb-8 pt-12 text-center text-xs text-muted-foreground">
-    Built with Vue 3 + .NET 10
-  </footer>
   <Toast />
 </template>

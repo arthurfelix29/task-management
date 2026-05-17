@@ -81,15 +81,18 @@ function onEscape() {
           error-id="create-task-error"
           hide-label
           v-bind="titleAttrs"
-        />
+        >
+          <template #suffix>
+            <span v-if="titleLength > 0" :class="counterClasses" aria-live="off">
+              {{ titleLength }}/{{ MAX_TITLE }}
+            </span>
+          </template>
+        </Input>
       </div>
       <Button type="submit" :disabled="isSubmitting">
         <Plus v-if="!isSubmitting" class="h-4 w-4" aria-hidden="true" />
         <span :class="{ 'ml-1.5': !isSubmitting }">{{ isSubmitting ? 'Adding…' : 'Add' }}</span>
       </Button>
-    </div>
-    <div class="flex justify-end">
-      <span :class="counterClasses" aria-live="off">{{ titleLength }}/{{ MAX_TITLE }}</span>
     </div>
     <FieldError id="create-task-error" :message="errors.title ?? ''" />
   </form>

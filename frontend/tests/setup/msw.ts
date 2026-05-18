@@ -17,7 +17,6 @@ export const sampleTask = (overrides: Partial<Task> = {}): Task => ({
 
 export const sampleListResponse = (data: Task[]): TaskListResponse => ({
   data,
-  count: data.length,
   links: [
     { rel: 'self', href: '/api/v1/tasks', method: 'GET' },
     { rel: 'create', href: '/api/v1/tasks', method: 'POST' },

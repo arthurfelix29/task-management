@@ -1,3 +1,4 @@
+import type { z } from 'zod'
 import { request, type Result } from '@/shared/lib/api-client'
 import type { ApiError } from '@/shared/lib/problem-details'
 import { taskListResponseSchema, taskSchema } from '@/features/tasks/schemas/task.schema'
@@ -37,9 +38,7 @@ function withSignal(options: ApiCallOptions): { signal?: AbortSignal } {
   return options.signal !== undefined ? { signal: options.signal } : {}
 }
 
-type SchemaOf<T> = { safeParse: (value: unknown) => { success: true; data: T } | { success: false; error: unknown } }
-
-function parse<T>(value: unknown, schema: SchemaOf<T>): Result<T, ApiError> {
+function parse<T>(value: unknown, schema: z.ZodType<T>): Result<T, ApiError> {
   const result = schema.safeParse(value)
   if (!result.success) {
     return { kind: 'error', error: { kind: 'contract', message: 'Response did not match expected shape.' } }

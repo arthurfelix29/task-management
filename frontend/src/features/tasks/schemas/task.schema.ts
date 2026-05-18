@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+export const TASK_TITLE_MAX_LENGTH = 200
+
 export const linkSchema = z.object({
   href: z.string(),
   rel: z.string(),
@@ -16,7 +18,6 @@ export const taskSchema = z.object({
 
 export const taskListResponseSchema = z.object({
   data: z.array(taskSchema),
-  count: z.number(),
   links: z.array(linkSchema),
 })
 
@@ -25,7 +26,7 @@ export const createTaskSchema = z.object({
     .string()
     .trim()
     .min(1, 'Title is required')
-    .max(200, 'Title must be 200 characters or fewer'),
+    .max(TASK_TITLE_MAX_LENGTH, `Title must be ${TASK_TITLE_MAX_LENGTH} characters or fewer`),
 })
 
 export type CreateTaskInput = z.infer<typeof createTaskSchema>

@@ -14,7 +14,6 @@ export type Task = {
 
 export type TaskListResponse = {
   data: Task[]
-  count: number
   links: Link[]
 }
 

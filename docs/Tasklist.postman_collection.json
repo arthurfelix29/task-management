@@ -1,0 +1,347 @@
+{
+  "info": {
+    "name": "Tasklist API",
+    "description": "REST API for a small task management application.\n\nFive endpoints: list tasks, create a task, read one task, toggle completion, delete a task. Responses use HATEOAS links (RFC 8288 relations) and errors use RFC 7807 ProblemDetails.\n\n## Setup\n\n1. Start the API: `dotnet run --project src/TaskList.Api` (listens on http://localhost:5113).\n2. The database is created and seeded automatically on first launch.\n3. Run the requests top to bottom. The collection variables capture IDs automatically, so the Create -> Toggle -> Delete chain works without manual copying.\n\n## Variables\n\n- `baseUrl` — defaults to http://localhost:5113. Change once here if you run on a different port.\n- `createdTaskId` — captured automatically from the Create response; consumed by Read one, Toggle, and Delete.\n- `seededTaskId` — captured automatically from the first item of the List response, so the read-only requests work against seeded data without depending on the Create chain.\n\n## Following HATEOAS links\n\nEach item in a response carries a `links` array, and every link includes its HTTP `method`: `self` is GET, `toggle` is POST, `delete` is DELETE, `create` is POST. The `href` is an absolute URL, so it is ready to call as-is.\n\nWhen you click a raw `href` from a response in Postman, Postman opens it as a GET regardless of the link's `method`. Calling a POST-only route (like toggle) with GET correctly returns 405 Method Not Allowed — that is the API behaving properly, not a bug; the route exists but does not accept GET. To follow a link, use the matching request in this collection (already set to the correct method), or set the method manually to the value named in that link's `method` field.\n\n## Folder order\n\n| Folder | Purpose |\n|---|---|\n| 1. Health | Liveness and readiness probes. Run first to confirm the API is up. |\n| 2. Tasks — happy path | List, create, read, toggle, delete in the order a client would use them. |\n| 3. Error cases | The validation (422), duplicate-title (409), and not-found (404) paths, each asserted. |",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5113" },
+    { "key": "createdTaskId", "value": "" },
+    { "key": "seededTaskId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Health",
+      "description": "Orchestration probes. No auth. `/health/live` checks the process is up with no dependency checks; `/health/ready` also verifies SQLite is reachable. Run these first to confirm the API is listening before exercising the task endpoints.",
+      "item": [
+        {
+          "name": "Liveness probe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/health/live", "host": ["{{baseUrl}}"], "path": ["health", "live"] },
+            "description": "Returns 200 with body `Healthy` if the process is alive. No database or dependency checks."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Readiness probe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/health/ready", "host": ["{{baseUrl}}"], "path": ["health", "ready"] },
+            "description": "Returns 200 if SQLite is reachable, 503 otherwise. Use this for orchestration readiness gating."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Tasks — happy path",
+      "description": "The five task endpoints in the order a client would use them. Create captures the new id into `createdTaskId`; List captures the first seeded id into `seededTaskId`. Toggle and Delete then run against `createdTaskId` with no manual copying.",
+      "item": [
+        {
+          "name": "List tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/tasks", "host": ["{{baseUrl}}"], "path": ["api", "v1", "tasks"] },
+            "description": "Returns 200 with `{ data, links }`. `data` is the tasks ordered by creation time descending; each task carries its own HATEOAS `links` (self, toggle, delete). `links` at the envelope level holds collection-level relations (self, create). There is no `count` field; the client derives it from `data.length`.\n\nEach link includes its `method` (self=GET, toggle=POST, delete=DELETE). Clicking a raw href in Postman opens it as GET, so a click on the toggle/delete link returns 405 — use this collection's Toggle and Delete requests (already set to the right method) to follow those relations. See the collection overview for details."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('has data array', () => pm.expect(body.data).to.be.an('array'));",
+                  "pm.test('has links array', () => pm.expect(body.links).to.be.an('array'));",
+                  "pm.test('no count field (contract is { data, links })', () => pm.expect(body).to.not.have.property('count'));",
+                  "if (body.data.length > 0) {",
+                  "  pm.collectionVariables.set('seededTaskId', body.data[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create task",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Take out the recycling\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/tasks", "host": ["{{baseUrl}}"], "path": ["api", "v1", "tasks"] },
+            "description": "Creates a task. Returns 201 with a Location header and the created `TaskResponse` body: `{ id, title, isCompleted, createdAt, links }`. The new id is captured into `createdTaskId` for the Toggle and Delete requests below.\n\nNote: if you run this twice without deleting, the second call returns 409 (duplicate title) — see folder 3."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('has Location header', () => pm.expect(pm.response.headers.has('Location')).to.be.true);",
+                  "const body = pm.response.json();",
+                  "pm.test('body has id, title, isCompleted, createdAt, links', () => {",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('title');",
+                  "  pm.expect(body).to.have.property('isCompleted');",
+                  "  pm.expect(body).to.have.property('createdAt');",
+                  "  pm.expect(body).to.have.property('links');",
+                  "});",
+                  "pm.test('new task starts not completed', () => pm.expect(body.isCompleted).to.be.false);",
+                  "pm.collectionVariables.set('createdTaskId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read one task",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tasks/{{createdTaskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "tasks", "{{createdTaskId}}"]
+            },
+            "description": "Returns 200 with a single `TaskResponse` for the task created above, or 404 if the id does not exist. Uses the `createdTaskId` captured by the Create request."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('id matches the created task', () => pm.expect(body.id).to.eql(pm.collectionVariables.get('createdTaskId')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Toggle completion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tasks/{{createdTaskId}}/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "tasks", "{{createdTaskId}}", "toggle"]
+            },
+            "description": "Flips `isCompleted` for the task. Returns 200 with the updated `TaskResponse`, or 404 if the id does not exist. Run it twice to see the value flip back."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('isCompleted flipped to true', () => pm.expect(body.isCompleted).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete task",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tasks/{{createdTaskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "tasks", "{{createdTaskId}}"]
+            },
+            "description": "Deletes the task. Returns 204 No Content on success, or 404 if the id does not exist. Deleting an already-deleted id returns 404."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Error cases",
+      "description": "The error paths, each asserted. Validation failures (422) come from FluentValidation as an HttpValidationProblemDetails with an `errors` map. Domain failures (409 duplicate title, 404 not found) come through the Result pipeline as RFC 7807 ProblemDetails where `title` is the error code (e.g. `task.duplicate_title`) and `detail` is the human-readable message.",
+      "item": [
+        {
+          "name": "Create — empty title (422)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/v1/tasks", "host": ["{{baseUrl}}"], "path": ["api", "v1", "tasks"] },
+            "description": "An empty title fails validation. Returns 422 Unprocessable Entity with `application/problem+json`, an `errors` object keyed by field, and the message \"Title is required.\""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422 Unprocessable Entity', () => pm.response.to.have.status(422));",
+                  "pm.test('content type is problem+json', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json'));",
+                  "const body = pm.response.json();",
+                  "pm.test('has errors map', () => pm.expect(body).to.have.property('errors'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create — title too long (422)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"This title is deliberately longer than the two hundred character maximum enforced by the validator so that the request is rejected with a 422 and the validation message about the length limit is returned to the client as expected here ok\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/tasks", "host": ["{{baseUrl}}"], "path": ["api", "v1", "tasks"] },
+            "description": "A title longer than 200 characters fails validation. Returns 422 with the message \"Title must be 200 characters or fewer.\" The 200-character limit is a single source of truth shared by the API validator and the database schema."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422 Unprocessable Entity', () => pm.response.to.have.status(422));",
+                  "const body = pm.response.json();",
+                  "pm.test('has errors map', () => pm.expect(body).to.have.property('errors'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create — duplicate title (409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Review pull requests from Q2 sprint backlog\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/v1/tasks", "host": ["{{baseUrl}}"], "path": ["api", "v1", "tasks"] },
+            "description": "This title is one of the tasks created by the seeder, so against a freshly seeded database it returns 409 Conflict on the first run. No need to run it twice. The response is `application/problem+json` with `title` = `task.duplicate_title` and `detail` = \"A task with the title 'Review pull requests from Q2 sprint backlog' already exists.\" The title comparison is case-insensitive and trimmed."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('content type is problem+json', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json'));",
+                  "const body = pm.response.json();",
+                  "pm.test('title is the duplicate-title error code', () => pm.expect(body.title).to.eql('task.duplicate_title'));",
+                  "pm.test('detail names the conflicting title', () => pm.expect(body.detail).to.include('Review pull requests from Q2 sprint backlog'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read one — not found (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tasks/00000000-0000-0000-0000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "tasks", "00000000-0000-0000-0000-000000000000"]
+            },
+            "description": "An id that does not exist returns 404 with `application/problem+json`, `title` = `task.not_found`, and a detail message naming the id."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 Not Found', () => pm.response.to.have.status(404));",
+                  "const body = pm.response.json();",
+                  "pm.test('title is the not-found error code', () => pm.expect(body.title).to.eql('task.not_found'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete — not found (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tasks/00000000-0000-0000-0000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "tasks", "00000000-0000-0000-0000-000000000000"]
+            },
+            "description": "Deleting an id that does not exist returns 404 with the same ProblemDetails shape as the read path."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

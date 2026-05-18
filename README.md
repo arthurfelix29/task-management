@@ -110,6 +110,8 @@ Expected: **36 tests passing** across six files.
 - **Scalar UI**: <http://localhost:5113/scalar/v1>
 - **OpenAPI document**: <http://localhost:5113/openapi/v1.json>
 
+A Postman collection is in `docs/Tasklist.postman_collection.json`: import it, start the API against a freshly seeded database, and run the folders top to bottom (the Create, Toggle, and Delete requests chain together by capturing IDs automatically).
+
 Task endpoints:
 
 | Method | Route | Purpose |

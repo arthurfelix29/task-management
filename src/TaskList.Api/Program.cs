@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 using TaskList.Api.Common.Endpoints;
-using TaskList.Api.Common.Middleware;
+using TaskList.Api.Common.ExceptionHandling;
 using TaskList.Application.Abstractions;
 using TaskList.Infrastructure;
 using TaskList.Infrastructure.Persistence;

@@ -3,7 +3,7 @@ using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TaskList.Api.Common.Middleware;
+namespace TaskList.Api.Common.ExceptionHandling;
 
 public sealed class GlobalExceptionHandler(IProblemDetailsService problemDetailsService, IHostEnvironment env, ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {

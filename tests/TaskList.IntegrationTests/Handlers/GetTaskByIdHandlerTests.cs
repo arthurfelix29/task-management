@@ -2,7 +2,7 @@ using Microsoft.Extensions.Time.Testing;
 using TaskList.Api.Features.Tasks.GetTaskById;
 using TaskList.Domain.Common;
 
-namespace TaskList.IntegrationTests.Features;
+namespace TaskList.IntegrationTests.Handlers;
 
 public sealed class GetTaskByIdHandlerTests
 {

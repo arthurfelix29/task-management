@@ -1,5 +1,5 @@
 using Shouldly;
-using TaskList.Api.Features.Tasks.Mapping;
+using TaskList.Api.Features.Tasks.Hateoas;
 
 namespace TaskList.ArchitectureTests;
 

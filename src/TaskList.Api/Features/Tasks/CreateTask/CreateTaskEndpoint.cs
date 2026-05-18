@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using TaskList.Api.Common;
 using TaskList.Api.Common.Endpoints;
 using TaskList.Api.Common.Extensions;
-using TaskList.Api.Features.Tasks.Mapping;
+using TaskList.Api.Features.Tasks.Hateoas;
 using TaskList.Application.Abstractions;
 using TaskList.Domain.Common;
 

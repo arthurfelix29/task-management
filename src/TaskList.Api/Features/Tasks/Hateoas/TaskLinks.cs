@@ -1,7 +1,7 @@
 using Ardalis.GuardClauses;
 using TaskList.Api.Common;
 
-namespace TaskList.Api.Features.Tasks.Mapping;
+namespace TaskList.Api.Features.Tasks.Hateoas;
 
 internal static class TaskLinks
 {

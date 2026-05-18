@@ -1,7 +1,7 @@
 using Ardalis.GuardClauses;
 using TaskList.Domain.Tasks;
 
-namespace TaskList.Api.Features.Tasks.Mapping;
+namespace TaskList.Api.Features.Tasks.Hateoas;
 
 public sealed record TaskResponse(Guid Id, string Title, bool IsCompleted, DateTimeOffset CreatedAt, IReadOnlyList<LinkResponse> Links)
 {

@@ -1,6 +1,6 @@
 using Ardalis.GuardClauses;
 using Microsoft.EntityFrameworkCore;
-using TaskList.Api.Features.Tasks.Mapping;
+using TaskList.Api.Features.Tasks.Hateoas;
 using TaskList.Application.Abstractions;
 using TaskList.Domain.Common;
 using TaskList.Domain.Tasks;

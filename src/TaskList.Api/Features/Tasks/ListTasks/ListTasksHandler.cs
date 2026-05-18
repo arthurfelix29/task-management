@@ -1,3 +1,4 @@
+using Ardalis.GuardClauses;
 using Microsoft.EntityFrameworkCore;
 using TaskList.Api.Features.Tasks.Hateoas;
 using TaskList.Application.Abstractions;
@@ -10,6 +11,8 @@ public sealed class ListTasksHandler(AppDbContext db) : IQueryHandler<ListTasksQ
 {
     public async Task<Result<IReadOnlyList<TaskResponse>>> HandleAsync(ListTasksQuery query, CancellationToken cancellationToken)
     {
+        Guard.Against.Null(query);
+
         var tasks = await db.Tasks.OrderByDescending(t => t.CreatedAt).ToListAsync(cancellationToken);
 
         return Result.Success<IReadOnlyList<TaskResponse>>(tasks.ConvertAll(TaskResponse.From));

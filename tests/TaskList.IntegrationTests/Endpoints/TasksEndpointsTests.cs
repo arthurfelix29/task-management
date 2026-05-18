@@ -85,7 +85,6 @@ public sealed class TasksEndpointsTests(TaskApiFactory factory) : IClassFixture<
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<JsonElement>(TestContext.Current.CancellationToken);
-        body.GetProperty("count").GetInt32().ShouldBe(2);
         body.GetProperty("data").GetArrayLength().ShouldBe(2);
     }
 

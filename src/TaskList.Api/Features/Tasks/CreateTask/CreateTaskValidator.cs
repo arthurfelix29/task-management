@@ -1,4 +1,5 @@
 using FluentValidation;
+using TaskList.Domain.Tasks;
 
 namespace TaskList.Api.Features.Tasks.CreateTask;
 
@@ -8,6 +9,6 @@ public sealed class CreateTaskValidator : AbstractValidator<CreateTaskCommand>
     {
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required.")
-            .MaximumLength(200).WithMessage("Title must be 200 characters or fewer.");
+            .MaximumLength(TaskItem.TitleMaxLength).WithMessage($"Title must be {TaskItem.TitleMaxLength} characters or fewer.");
     }
 }

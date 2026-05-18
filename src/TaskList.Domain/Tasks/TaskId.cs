@@ -6,7 +6,5 @@ public readonly record struct TaskId(Guid Value)
 
     public static implicit operator Guid(TaskId id) => id.Value;
 
-    public Guid ToGuid() => Value;
-
     public override string ToString() => Value.ToString();
 }

@@ -16,11 +16,8 @@ public static class ResultExtensions
 
         var statusCode = result.Error.Type switch
         {
-            ErrorType.Validation => StatusCodes.Status422UnprocessableEntity,
             ErrorType.NotFound => StatusCodes.Status404NotFound,
             ErrorType.Conflict => StatusCodes.Status409Conflict,
-            ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
-            ErrorType.Forbidden => StatusCodes.Status403Forbidden,
             _ => StatusCodes.Status500InternalServerError,
         };
 
@@ -28,6 +25,9 @@ public static class ResultExtensions
             detail: result.Error.Description,
             statusCode: statusCode,
             title: result.Error.Code,
-            type: string.Create(CultureInfo.InvariantCulture, $"https://datatracker.ietf.org/doc/html/rfc9110#name-{statusCode}"));
+            type: ProblemTypeUriFor(statusCode));
     }
+
+    public static string ProblemTypeUriFor(int statusCode)
+        => string.Create(CultureInfo.InvariantCulture, $"https://datatracker.ietf.org/doc/html/rfc9110#name-{statusCode}");
 }

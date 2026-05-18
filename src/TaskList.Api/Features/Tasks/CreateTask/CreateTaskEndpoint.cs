@@ -40,7 +40,7 @@ public sealed class CreateTaskEndpoint : IEndpointGroup
             {
                 Status = StatusCodes.Status422UnprocessableEntity,
                 Title = "Validation failed",
-                Type = "https://datatracker.ietf.org/doc/html/rfc9110#name-422",
+                Type = ResultExtensions.ProblemTypeUriFor(StatusCodes.Status422UnprocessableEntity),
             });
         }
 

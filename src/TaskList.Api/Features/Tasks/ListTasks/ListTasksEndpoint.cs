@@ -36,10 +36,7 @@ public sealed class ListTasksEndpoint : IEndpointGroup
             .Select(t => t with { Links = TaskLinks.ForItem(links, httpContext, t.Id) })
             .ToList();
 
-        var response = new ListTasksResponse(
-            tasksWithLinks,
-            tasksWithLinks.Count,
-            TaskLinks.ForCollection(links, httpContext));
+        var response = new ListTasksResponse(tasksWithLinks, TaskLinks.ForCollection(links, httpContext));
 
         return TypedResults.Ok(response);
     }

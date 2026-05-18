@@ -1,7 +1,7 @@
-using System.Globalization;
 using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using TaskList.Api.Common.Extensions;
 
 namespace TaskList.Api.Common.ExceptionHandling;
 
@@ -26,9 +26,8 @@ public sealed class GlobalExceptionHandler(IProblemDetailsService problemDetails
             _ => (StatusCodes.Status500InternalServerError, "Internal server error"),
         };
 
-        var detail = env.IsDevelopment() || statusCode < StatusCodes.Status500InternalServerError
-            ? exception.Message
-            : "An unexpected error occurred.";
+        var productionDetail = statusCode < StatusCodes.Status500InternalServerError ? title : "An unexpected error occurred.";
+        var detail = env.IsDevelopment() ? exception.Message : productionDetail;
 
         httpContext.Response.StatusCode = statusCode;
 
@@ -39,7 +38,7 @@ public sealed class GlobalExceptionHandler(IProblemDetailsService problemDetails
             {
                 Status = statusCode,
                 Title = title,
-                Type = string.Create(CultureInfo.InvariantCulture, $"https://datatracker.ietf.org/doc/html/rfc9110#name-{statusCode}"),
+                Type = ResultExtensions.ProblemTypeUriFor(statusCode),
                 Detail = detail,
             },
         });

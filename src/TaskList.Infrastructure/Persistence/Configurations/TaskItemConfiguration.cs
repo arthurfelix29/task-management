@@ -15,7 +15,7 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
             .ValueGeneratedNever();
 
         builder.Property(t => t.Title)
-            .HasMaxLength(200)
+            .HasMaxLength(TaskItem.TitleMaxLength)
             .IsRequired();
 
         builder.Property(t => t.CreatedAt)
